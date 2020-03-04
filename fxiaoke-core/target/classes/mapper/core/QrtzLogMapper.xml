@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chylee.fxiaoke.core.mapper.QrtzLogMapper">
+    <update id="updateEndtimeById">
+        update qrtz_log set end_time = CURRENT_TIMESTAMP<if test='error!=null'>, error = #{error}</if> where id = #{id}
+    </update>
+
+    <select id="listByPage" resultType="com.chylee.fxiaoke.core.model.QrtzLog">
+        select * From qrtz_log order by id desc
+        limit <if test="offset > 0">#{offset,jdbcType=INTEGER}, </if>#{pageSize,jdbcType=INTEGER}
+    </select>
+</mapper>

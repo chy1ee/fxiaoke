@@ -1,0 +1,31 @@
+.chylee-container {
+  .page-title {
+    font-weight: bold;
+    font-size: 16px;
+    background-color: #fff;
+    padding: 15px 20px 15px 20px;
+  }
+  .page-content {
+    margin: 12px;
+    padding: 10px;
+    background-color: #fff;
+    .action-bar {
+      margin-bottom: 20px;
+    }
+
+    .chylee-header {
+      background:#fafafa;
+      color: #222222;
+    }
+
+    .el-pagination {
+      margin-top: 10px;
+      padding-left: 0;
+    }
+  }
+}
+
+.el-pagination {
+  margin-top: 10px;
+  padding-left: 0;
+}

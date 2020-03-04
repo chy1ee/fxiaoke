@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.chylee</groupId>
+    <artifactId>fxiaoke</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0.0</version>
+    <modules>
+        <module>fxiaoke-common</module>
+        <module>fxiaoke-core</module>
+        <module>fxiaoke-security-starter</module>
+        <module>fxiaoke-xjl</module>
+        <module>fxiaoke-admin-portal</module>
+        <module>chylee-code</module>
+    </modules>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.1.RELEASE</version>
+        <relativePath />
+    </parent>
+
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <spring-boot.version>2.2.1.RELEASE</spring-boot.version>
+        <spring-oauth2.version>2.4.0.RELEASE</spring-oauth2.version>
+        <ehcache.version>2.10.6</ehcache.version>
+        <swagger2.version>2.9.2</swagger2.version>
+        <mybatis-starter.version>2.1.1</mybatis-starter.version>
+        <druid-starter.version>1.1.20</druid-starter.version>
+        <mysql.version>8.0.18</mysql.version>
+        <sqlserver.version>7.4.0.jre8</sqlserver.version>
+        <chylee.version>1.0.0</chylee.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

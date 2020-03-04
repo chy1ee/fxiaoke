@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chylee.fxiaoke.xjl.mapper.AcrtkMapper">
+    <select id="loadByDbAndDh" resultType="com.chylee.fxiaoke.xjl.model.Acrtk">
+        SELECT * FROM ACRTK WHERE TK001=#{db} AND TK002=#{dh}
+    </select>
+
+    <select id="listSummary" resultType="com.chylee.fxiaoke.xjl.model.Acrtk">
+        SELECT a.TK001, a.TK002
+        FROM ACRTK a
+        WHERE ((CREATE_DATE >= #{startTime} AND CREATE_DATE &lt; #{endTime})
+            OR (MODI_DATE >= #{startTime} AND MODI_DATE &lt; #{endTime}))
+            AND a.TK020 = 'Y'
+            AND a.TK001 = '6301'
+            AND EXISTS(
+                SELECT NULL
+                FROM ACRTL b, ACRTB c, COPTH d, COPTD e
+                WHERE b.TL001 = a.TK001 AND b.TL002 = a.TK002 AND b.TL027 = 'Y'
+                    AND c.TB001 = b.TL005 AND c.TB002 = b.TL006
+                    AND d.TH001 = c.TB005 AND d.TH002 = c.TB006 AND d.TH003 = c.TB007
+                    AND e.TD001 = d.TH014 AND e.TD002 = d.TH015 AND e.TD003 = d.TH016 AND e.TD018 LIKE '02%'
+            )
+    </select>
+
+</mapper>

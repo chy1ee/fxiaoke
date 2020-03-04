@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+  cache:
+    ehcache:
+      config: classpath:ehcache/ehcache.xml
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+chylee:
+  security:
+    enabled: true
+    ignores: /static/**,/test/**

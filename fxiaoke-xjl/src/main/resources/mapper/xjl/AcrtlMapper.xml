@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chylee.fxiaoke.xjl.mapper.AcrtlMapper">
+
+    <select id="listDetail" resultType="com.chylee.fxiaoke.xjl.model.Acrtl">
+        SELECT b.TL019, b.TL023, e.TD001 TL005, e.TD002 TL006
+        FROM ACRTL b, ACRTB c, COPTH d, COPTD e
+        WHERE b.TL001 = #{db} AND b.TL002 = #{dh} AND b.TL019 > 0
+            AND c.TB001 = b.TL005 AND c.TB002 = b.TL006
+            AND d.TH001 = c.TB005 AND d.TH002 = c.TB006 AND d.TH003 = c.TB007
+            AND e.TD001 = d.TH014 AND e.TD002 = d.TH015 AND e.TD003 = d.TH016
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chylee.fxiaoke.common.mapper.JobLogMapper">
+    <update id="updateById" parameterType="com.chylee.fxiaoke.common.model.JobLog">
+        update job_log
+        <set>
+            <if test="count!=null">count=#{count},</if>
+            <if test="message!=null">message=#{message},</if>
+            <if test="success!=null">success=#{success},</if>
+            <if test="fail!=null">fail=#{fail},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <select id="count" resultType="Integer">
+        select count(*) from job_log
+        <trim prefix="WHERE" prefixOverrides="and" >
+            <if test="qrtzId > 0">and qrtz_id = #{qrtzId}</if>
+            <if test="valid > 0">and count > 0</if>
+        </trim>
+    </select>
+
+    <select id="listAllByPage" resultType="com.chylee.fxiaoke.common.model.JobLog">
+        select b.id,a.job_group,a.job_name,c.name type, b.start_time,b.end_time,b.count, b.success, b.fail, b.count-b.success-b.fail waiting
+        from job_log b
+        left join qrtz_log a on a.id = b.qrtz_id
+        left join job_type c on c.id = b.type_id
+        <trim prefix="WHERE" prefixOverrides="and" >
+            <if test="qrtzId > 0">and b.qrtz_id = #{qrtzId}</if>
+            <if test="valid > 0">and b.count > 0</if>
+        </trim>
+        order by b.id desc
+        limit #{offset}, #{pageSize}
+    </select>
+</mapper>

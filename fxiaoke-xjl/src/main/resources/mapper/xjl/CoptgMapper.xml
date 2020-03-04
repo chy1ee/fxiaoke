@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chylee.fxiaoke.xjl.mapper.CoptgMapper">
+    <select id="list" resultType="com.chylee.fxiaoke.xjl.model.Coptg">
+        select TG001,TG002
+        from COPTG c
+        WHERE ((CREATE_DATE >= #{startTime} AND CREATE_DATE &lt; #{endTime})
+            OR (MODI_DATE >= #{startTime} AND MODI_DATE &lt; #{endTime}))
+            AND TG023 = 'Y'
+            AND EXISTS(
+                SELECT NULL
+                FROM COPTH d, COPTD e
+                WHERE d.TH001 = c.TG001 AND d.TH002 = c.TG002
+                    AND e.TD001 = d.TH014 AND e.TD002 = d.TH015 AND e.TD003 = d.TH016 AND e.TD018 LIKE '02%'
+            )
+    </select>
+
+</mapper>

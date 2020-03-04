@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    core:
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/fxiaoke?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    xjl:
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=XJL01;
+      username: fxiaoke
+      password: 123456
+
+logging:
+  level:
+    root: error
+    com.chylee: debug
