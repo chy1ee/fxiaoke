@@ -9,7 +9,7 @@ import com.chylee.fxiaoke.common.service.SysReportService;
 import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.DingdanRespEvent;
-import com.chylee.fxiaoke.xjl.jobs.JobContextHolder;
+import com.chylee.fxiaoke.common.jobs.JobContextHolder;
 import com.chylee.fxiaoke.xjl.service.*;
 import com.chylee.fxiaoke.xjl.service.impl.FxkProductObjServiceImpl;
 import org.springframework.stereotype.Component;

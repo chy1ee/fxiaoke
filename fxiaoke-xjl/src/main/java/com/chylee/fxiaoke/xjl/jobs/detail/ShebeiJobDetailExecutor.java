@@ -12,7 +12,7 @@ import com.chylee.fxiaoke.common.service.SysReportService;
 import com.chylee.fxiaoke.common.util.DateUtils;
 import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.ShebeiRespEvent;
-import com.chylee.fxiaoke.xjl.jobs.JobContextHolder;
+import com.chylee.fxiaoke.common.jobs.JobContextHolder;
 import com.chylee.fxiaoke.xjl.service.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

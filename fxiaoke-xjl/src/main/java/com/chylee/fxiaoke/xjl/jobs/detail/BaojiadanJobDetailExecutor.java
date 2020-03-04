@@ -14,7 +14,7 @@ import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.AccountReqEvent;
 import com.chylee.fxiaoke.xjl.event.AccountRespEvent;
 import com.chylee.fxiaoke.xjl.event.BaojiadanReqEvent;
-import com.chylee.fxiaoke.xjl.jobs.JobContextHolder;
+import com.chylee.fxiaoke.common.jobs.JobContextHolder;
 import com.chylee.fxiaoke.xjl.service.*;
 import org.springframework.stereotype.Component;
 

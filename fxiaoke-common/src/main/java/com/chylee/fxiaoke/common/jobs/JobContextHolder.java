@@ -1,4 +1,4 @@
-package com.chylee.fxiaoke.xjl.jobs;
+package com.chylee.fxiaoke.common.jobs;
 
 import java.util.List;
 

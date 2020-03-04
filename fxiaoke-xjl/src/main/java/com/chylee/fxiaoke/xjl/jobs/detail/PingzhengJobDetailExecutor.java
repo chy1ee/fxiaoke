@@ -12,7 +12,7 @@ import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.common.api.Constants;
 import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.PingzhengReqEvent;
-import com.chylee.fxiaoke.xjl.jobs.JobContextHolder;
+import com.chylee.fxiaoke.common.jobs.JobContextHolder;
 import com.chylee.fxiaoke.xjl.service.ErpPingzhengService;
 import com.chylee.fxiaoke.xjl.service.FxkAccountService;
 import com.chylee.fxiaoke.xjl.service.FxkObject79pYPService;
