@@ -1,19 +1,20 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.OrderPaymentObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.PaymentObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.SalesOrderObj;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.xjl.event.data.object.OrderPaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.PaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.SalesOrderObj;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
 import com.chylee.fxiaoke.common.service.SysReportService;
 import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.HuikuanRespEvent;
-import com.chylee.fxiaoke.common.jobs.JobContextHolder;
 import com.chylee.fxiaoke.xjl.service.*;
 import org.springframework.stereotype.Component;
 
+import javax.xml.ws.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,15 @@ public class HuikuanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
 
 
     @Override
-    protected void saveEvent(Event event) throws ErpDataException, CrmApiException {
+    protected void writeErrorTo(String dataId, String error) {
+    }
+
+    @Override
+    protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
+    }
+
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws ErpDataException, CrmApiException {
         HuikuanRespEvent respEvent = (HuikuanRespEvent)event;
         PaymentObj paymentObj = respEvent.getPaymentObj();
         List<OrderPaymentObj> orderPaymentObjs = respEvent.getOrderPaymentObjs();
@@ -60,7 +69,7 @@ public class HuikuanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
 
         paymentObjService.save(paymentObj, detail);
 
-        JobContextHolder.setSuccess();
+        return new ResponseEvent();
     }
 
     @Override

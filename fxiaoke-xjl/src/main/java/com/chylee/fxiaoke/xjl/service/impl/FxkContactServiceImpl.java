@@ -3,7 +3,7 @@ package com.chylee.fxiaoke.xjl.service.impl;
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoOrder;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ContactObj;
+import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;
 import com.chylee.fxiaoke.xjl.service.FxkContactService;

@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.xjl.service;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.QuoteObj;
+import com.chylee.fxiaoke.xjl.event.data.object.QuoteObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 

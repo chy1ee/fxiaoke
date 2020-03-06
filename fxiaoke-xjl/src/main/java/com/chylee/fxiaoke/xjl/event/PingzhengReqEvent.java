@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.event;
 
 import com.chylee.fxiaoke.common.event.RequestEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_79pYP__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_okom1__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_79pYP__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_okom1__c;
 
 import java.util.List;
 

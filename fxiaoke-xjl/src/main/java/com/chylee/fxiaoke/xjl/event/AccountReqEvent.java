@@ -1,9 +1,9 @@
 package com.chylee.fxiaoke.xjl.event;
 
 import com.chylee.fxiaoke.common.event.RequestEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountAddrObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ContactObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountAddrObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
 
 import java.util.List;
 

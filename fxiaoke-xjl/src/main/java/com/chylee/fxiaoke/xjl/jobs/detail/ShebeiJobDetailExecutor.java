@@ -1,10 +1,11 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.DeviceObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_47F7O__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_snPZx__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ProductObj;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.xjl.event.data.object.DeviceObj;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_47F7O__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_snPZx__c;
+import com.chylee.fxiaoke.xjl.event.data.object.ProductObj;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
@@ -17,6 +18,7 @@ import com.chylee.fxiaoke.xjl.service.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.xml.ws.Response;
 import java.util.List;
 
 @Component
@@ -24,31 +26,38 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     private final ErpShebeiService shebeiService;
     private final FxkProductObjService productObjService;
     private final FxkPersonnelObjService personnelObjService;
-    private final FxkObjectSnPZxService objectSnPZxService;
-    private final FxkObject47F7OService object47F7OService;
+    private final FxkHetongService hetongService;
+    private final FxkHetongMxService hetongMxService;
     private final FxkDeviceObjService deviceObjService;
 
     protected ShebeiJobDetailExecutor(JobDetailService jobDetailService, SysReportService reportService,
                                       FXKSequenceService sequenceService, ErpShebeiService shebeiService,
                                       FxkProductObjService productObjService, FxkPersonnelObjService personnelObjService,
-                                      FxkObjectSnPZxService objectSnPZxService, FxkObject47F7OService object47F7OService,
+                                      FxkHetongService hetongService, FxkHetongMxService hetongMxService,
                                       FxkDeviceObjService deviceObjService) {
         super(jobDetailService, reportService, sequenceService);
         this.shebeiService = shebeiService;
         this.productObjService = productObjService;
         this.personnelObjService = personnelObjService;
-        this.objectSnPZxService = objectSnPZxService;
-        this.object47F7OService = object47F7OService;
+        this.hetongService = hetongService;
+        this.hetongMxService = hetongMxService;
         this.deviceObjService = deviceObjService;
     }
 
     @Override
-    protected void saveEvent(Event event) throws CrmApiException {
+    protected void writeErrorTo(String dataId, String error) {
+    }
+
+    @Override
+    protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
+    }
+
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws CrmApiException {
         ShebeiRespEvent respEvent = (ShebeiRespEvent)event;
         for (DeviceObj obj : respEvent.getDeviceObjs())
             deviceObjService.save(obj);
-
-        JobContextHolder.setSuccess();
+        return new ResponseEvent();
     }
 
     @Override
@@ -75,7 +84,7 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
             obj.setOwner(personnelObjService.getOwner(null));
 
             //合同
-            List<Object_snPZx__c> hts = objectSnPZxService.listByDbAndDh(obj.getDb().trim(), obj.getDh().trim());
+            List<Object_snPZx__c> hts = hetongService.listByDbAndDh(obj.getDb().trim(), obj.getDh().trim());
             if (hts == null || hts.isEmpty())
                 throw new CrmDataException(String.format("找不到对应的合同：%s-%s", obj.getDb().trim(), obj.getDh().trim()));
 
@@ -84,7 +93,7 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
             obj.setContact_id(ht.getField_Vvn5I__c());          //联系人
             obj.setBuy_time(Long.toString(ht.getField_jQWIc__c().getTime()));   //购买日期 合同日期
 
-            for (Object_47F7O__c htmx : object47F7OService.listByHtId(ht.get_id())) {
+            for (Object_47F7O__c htmx : hetongMxService.listByHtId(ht.get_id())) {
                 if (ht.getField_P9um1__c() != null && ht.getField_P9um1__c().equals(htmx.getField_Oocl6__c())) {
                     obj.setDevice_product_id(htmx.getField_6210o__c());     //产品
                     ProductObj productObj = productObjService.loadById(htmx.getField_6210o__c());

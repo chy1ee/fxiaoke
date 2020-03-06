@@ -1,7 +1,8 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.*;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.xjl.event.data.object.*;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
@@ -46,7 +47,15 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     }
 
     @Override
-    protected void saveEvent(Event reqEvent) throws CrmApiException {
+    protected void writeErrorTo(String dataId, String error) {
+    }
+
+    @Override
+    protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
+    }
+
+    @Override
+    protected ResponseEvent saveEvent(Event reqEvent) throws CrmApiException {
         DingdanRespEvent respEvent = (DingdanRespEvent)reqEvent;
 
         SalesOrderObj salesOrderObj = respEvent.getSalesOrderObj();
@@ -64,7 +73,7 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
 
         salesOrderObjService.save(salesOrderObj, detail);
 
-        JobContextHolder.setSuccess();
+        return new ResponseEvent();
     }
 
     @Override
@@ -87,9 +96,9 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         SalesOrderObj salesOrderObj = respEvent.getSalesOrderObj();
         List<String> owner = personnelObjService.getOwner(salesOrderObj.getOwner() == null ? null : salesOrderObj.getOwner().get(0));
         salesOrderObj.setOwner(owner);
-        JobContextHolder.setType("订单");
-        JobContextHolder.setSerialNo(String.format("%s-%s", salesOrderObj.getField_4m6gr__c(), salesOrderObj.getField_4xWXT__c()));
-        JobContextHolder.setOwner(owner);
+        JobContextHolder.getContext().setType("订单");
+        JobContextHolder.getContext().setSerialNo(String.format("%s-%s", salesOrderObj.getField_4m6gr__c(), salesOrderObj.getField_4xWXT__c()));
+        JobContextHolder.getContext().setOwner(owner);
 
         //客户
         AccountObj accountObj = accountService.loadById(respEvent.getSalesOrderObj().getAccount_id());

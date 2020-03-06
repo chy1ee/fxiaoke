@@ -3,7 +3,7 @@ package com.chylee.fxiaoke.quartz.jobs;
 import com.chylee.fxiaoke.common.service.JobLogService;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.util.StringUtils;
-import com.chylee.fxiaoke.quartz.SpringQuartzJob;
+import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
 import com.chylee.fxiaoke.common.jobs.detail.JobDetailExecutor;
 import com.chylee.fxiaoke.common.service.JobDetailService;
 import com.chylee.fxiaoke.common.service.SysReportService;
@@ -41,7 +41,6 @@ public class DefaultJobDetailHandler implements SpringQuartzJob, ApplicationCont
 
     @Override
     public void invoke(int qrtzId, String params) {
-        boolean isSuccess = true;
         ResultContext context = new ResultContext();
         while(true) {
             List<JobDetail> jobDetails = jobDetailService.listStatus0();
@@ -54,21 +53,14 @@ public class DefaultJobDetailHandler implements SpringQuartzJob, ApplicationCont
             for (JobDetail jobDetail : jobDetails) {
                 if (handleJobDetail(jobDetail))
                     context.addSuccess(jobDetail.getLogId());
-                else {
-                    if (isSuccess)
-                        isSuccess = false;
-
+                else
                     context.addFail(jobDetail.getLogId());
-                }
             }
         }
 
         Collection<Result> results = context.getContext();
         for (Result result : results)
             jobLogService.updateResultById(result.getLogId(), result.getSuccess(), result.getFail());
-
-        if(!isSuccess)
-            reportService.send("数据对接系统对接数据时发生错误，请注意查看日志");
     }
 
 

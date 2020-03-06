@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.service.impl;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_47F7O__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_snPZx__c;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_47F7O__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_snPZx__c;
 import com.chylee.fxiaoke.common.util.DateUtils;
 import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.xjl.event.AccountRespEvent;
@@ -43,21 +43,21 @@ public class ErpHetongServiceImpl implements ErpHetongService {
     @Override
     @Transactional("xjlTransactionManager")
     public AccountRespEvent save(HetongReqEvent reqEvent) {
+        AccountObj accountObj = reqEvent.getAccountObj();
+        if (accountObj == null)
+            return new AccountRespEvent("客户不允许为空");
+
+        // 写客户信息
+        AccountRespEvent accountRespEvent = accountService.save(reqEvent);
+        if (!accountRespEvent.isSuccess())
+            return accountRespEvent;
+
         Object_snPZx__c ht = reqEvent.getHt();
         Object_47F7O__c htmx = reqEvent.getHtmx();
 
-        AccountObj accountObj = reqEvent.getAccountObj();
-
-        // 写客户信息
-        String khbh = null;
-        if (accountObj != null && StringUtils.isEmpty(accountObj.getField_AlGoN__c())) {
-            AccountRespEvent accountRespEvent = accountService.save(reqEvent);
-            if (!accountRespEvent.isSuccess())
-                return accountRespEvent;
-
-            khbh = accountRespEvent.getKhbh();
-            ht.setAA010(khbh);
-        }
+        String khbhToReturn = accountRespEvent.getKhbh();
+        if (StringUtils.isEmpty(ht.getAA010()))
+            ht.setAA010(khbhToReturn);
 
         BigDecimal sl = copmaMapper.loadShuilv(ht.getAA010());
         if (sl == null)
@@ -80,8 +80,8 @@ public class ErpHetongServiceImpl implements ErpHetongService {
         }
 
         AccountRespEvent respEvent = new AccountRespEvent();
-        if (khbh != null)
-            respEvent.setKhbh(khbh);
+        if (khbhToReturn != null)
+            respEvent.setKhbh(khbhToReturn);
 
         return respEvent;
     }

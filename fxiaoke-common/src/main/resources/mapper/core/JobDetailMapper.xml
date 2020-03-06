@@ -8,6 +8,12 @@
         where t.id=q.log_id and q.status = 0 limit #{pageSize}
     </select>
 
+    <select id="listAll" resultType="com.chylee.fxiaoke.common.model.JobDetail">
+        select q.id, q.log_id,q.data_id,q.status,q.error,t.type_id
+        from job_detail q,job_log t
+        where t.id=q.log_id and t.type_id=#{typeId}<if test="id>0"> and a.id>#{id}</if>
+    </select>
+
     <select id="count" resultType="Integer">
         select count(*) from job_detail
         <choose>

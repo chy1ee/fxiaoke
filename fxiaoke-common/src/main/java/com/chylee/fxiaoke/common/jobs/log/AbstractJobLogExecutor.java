@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public abstract class AbstractJobLogExecutor extends ComplieModeSupported implements JobLogExecutor {
+public abstract class AbstractJobLogExecutor implements JobLogExecutor {
     protected Logger logger = LoggerFactory.getLogger(AbstractJobLogExecutor.class);
 
     private final JobLogService jobLogService;
@@ -51,13 +51,7 @@ public abstract class AbstractJobLogExecutor extends ComplieModeSupported implem
 
     //当前时间
     protected Date now(int qrtzId, int typeId, String apiName) {
-        Calendar now = Calendar.getInstance();
-
-        // 开发模式时间推前24小时
-        if (isDevMode())
-            now.add(Calendar.DAY_OF_MONTH, -1);
-
-        return now.getTime();
+        return new Date();
     }
 
     protected abstract List<JobDetail> listJobs(Integer logId, String apiName, Date startTime, Date endTime)

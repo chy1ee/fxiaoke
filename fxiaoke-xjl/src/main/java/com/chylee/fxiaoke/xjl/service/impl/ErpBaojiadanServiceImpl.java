@@ -2,9 +2,9 @@ package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.xjl.event.AccountRespEvent;
 import com.chylee.fxiaoke.xjl.event.BaojiadanReqEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.QuoteLinesObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.QuoteObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.QuoteLinesObj;
+import com.chylee.fxiaoke.xjl.event.data.object.QuoteObj;
 import com.chylee.fxiaoke.common.util.DateUtils;
 import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.xjl.mapper.CoptaMapper;
@@ -31,27 +31,6 @@ public class ErpBaojiadanServiceImpl implements ErpBaojiadanService {
 
     private final ErpAccountService accountService;
 
-    private class Xq {
-        private String xq1;
-        private String xq2;
-
-        public String getXq1() {
-            return xq1;
-        }
-
-        public void setXq1(String xq1) {
-            this.xq1 = xq1;
-        }
-
-        public String getXq2() {
-            return xq2;
-        }
-
-        public void setXq2(String xq2) {
-            this.xq2 = xq2;
-        }
-    }
-
     public ErpBaojiadanServiceImpl(CoptaMapper coptaMapper, CoptbMapper coptbMapper, ErpAccountService accountService) {
         this.coptaMapper = coptaMapper;
         this.coptbMapper = coptbMapper;
@@ -61,23 +40,24 @@ public class ErpBaojiadanServiceImpl implements ErpBaojiadanService {
     @Override
     @Transactional("xjlTransactionManager")
     public AccountRespEvent save(BaojiadanReqEvent reqEvent) {
+        AccountObj accountObj = reqEvent.getAccountObj();
+        if (accountObj == null)
+            return new AccountRespEvent("客户不允许为空");
+
+        // 写客户信息
+        AccountRespEvent accountRespEvent = accountService.save(reqEvent);
+        if (!accountRespEvent.isSuccess())
+            return accountRespEvent;
+
         QuoteObj quoteObj = reqEvent.getQuoteObj();
         QuoteLinesObj quoteLinesObj = reqEvent.getQuoteLinesObj();
-        AccountObj accountObj = reqEvent.getAccountObj();
+
+        String khbhToReturn = accountRespEvent.getKhbh();
+        if (StringUtils.isEmpty(quoteObj.getAccount_bh()))
+            quoteObj.setAccount_bh(khbhToReturn);
 
         //修复金额显示问题
         quoteLinesObj.setTotal_amount(quoteObj.getQuote_amount());
-
-        // 写客户信息
-        String khbh = null;
-        if (accountObj != null && StringUtils.isEmpty(accountObj.getField_AlGoN__c())) {
-            AccountRespEvent accountRespEvent = accountService.save(reqEvent);
-            if (!accountRespEvent.isSuccess())
-                return accountRespEvent;
-
-            khbh = accountRespEvent.getKhbh();
-            quoteObj.setAccount_bh(khbh);
-        }
 
         //写明细表
         try {
@@ -98,8 +78,8 @@ public class ErpBaojiadanServiceImpl implements ErpBaojiadanService {
         }
 
         AccountRespEvent respEvent = new AccountRespEvent();
-        if (khbh != null)
-            respEvent.setKhbh(khbh);
+        if (khbhToReturn != null)
+            respEvent.setKhbh(khbhToReturn);
 
         return respEvent;
     }

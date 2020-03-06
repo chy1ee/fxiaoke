@@ -1,9 +1,11 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.QuoteLinesObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.QuoteObj;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_1sCfv__c;
+import com.chylee.fxiaoke.xjl.event.data.object.QuoteLinesObj;
+import com.chylee.fxiaoke.xjl.event.data.object.QuoteObj;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
@@ -23,16 +25,18 @@ import java.util.List;
 @Component
 public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor {
     private final ErpBaojiadanService baojiadanService;
+    private final FxkBaojiadanDjService baojiadanDjService;
     private final FxkQuoteObjService quoteObjService;
     private final FxkQuoteLinesObjService quoteLinesObjService;
 
     protected BaojiadanJobDetailExecutor(JobDetailService jobDetailService, SysReportService reportService,
                                          FXKSequenceService sequenceService, FxkAccountService accountService,
                                          FxkContactService contactObjService, FxkAccountAddrService accountAddrService,
-                                         ErpBaojiadanService baojiadanService, FxkQuoteObjService quoteObjService,
-                                         FxkQuoteLinesObjService quoteLinesObjService) {
+                                         ErpBaojiadanService baojiadanService, FxkBaojiadanDjService baojiadanDjService,
+                                         FxkQuoteObjService quoteObjService, FxkQuoteLinesObjService quoteLinesObjService) {
         super(jobDetailService, reportService, sequenceService, accountService, contactObjService, accountAddrService);
         this.baojiadanService = baojiadanService;
+        this.baojiadanDjService = baojiadanDjService;
         this.quoteObjService = quoteObjService;
         this.quoteLinesObjService = quoteLinesObjService;
     }
@@ -43,43 +47,52 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
     }
 
     @Override
-    protected void saveEvent(Event event) throws ErpDataException, CrmApiException {
-        BaojiadanReqEvent reqEvent = (BaojiadanReqEvent)event;
-        String khbh = saveToErp(reqEvent);
-        if (!isDevMode())
-            saveToCrm(khbh, reqEvent);
-
-        JobContextHolder.setSerialNo(String.format("%s-%s",
-                reqEvent.getQuoteObj().getField_kq20e__c(), reqEvent.getQuoteObj().getField_SS32r__c()));
-        JobContextHolder.setSuccess();
+    protected void writeErrorTo(String dataId, String error) {
+        try {
+            baojiadanDjService.save(dataId, null, null, error, false);
+        } catch (CrmApiException e) {
+            logger.error(error, e);
+        }
     }
 
-    private void saveToCrm(String khbh, BaojiadanReqEvent reqEvent) throws CrmApiException {
+    @Override
+    protected void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException {
+        BaojiadanReqEvent reqEvent = (BaojiadanReqEvent)event;
+        AccountRespEvent respEvent = (AccountRespEvent)resp;
+
         //回写客户编号CRM保存结果
+        String khbh = respEvent.getKhbh();
         if(khbh != null) {
             String accountId = reqEvent.getAccountObj().get_id();
-            Debug("开始回写客户编号：{}-{}", accountId, khbh);
-            updateAccountKhbh(accountId, khbh);
+            try {
+                updateAccountKhbh(accountId, khbh);
+            }
+            catch(CrmApiException e) {
+                String error = String.format("%s[客户][%s][%s]",
+                        Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, khbh, accountId);
+                logger.error(error, e);
+                throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
+            }
         }
 
         //回写单号单别
         QuoteObj quoteObj = reqEvent.getQuoteObj();
         String db = quoteObj.getField_kq20e__c();
         String dh = quoteObj.getField_SS32r__c();
-
-        QuoteObj quoteObjToUpdate = new QuoteObj();
-        quoteObjToUpdate.setDataObjectApiName("QuoteObj");
-        quoteObjToUpdate.set_id(quoteObj.get_id());
-        quoteObjToUpdate.setField_kq20e__c(db);
-        quoteObjToUpdate.setField_SS32r__c(dh);
         try {
-            quoteObjService.update(quoteObjToUpdate);
+            baojiadanDjService.save(quoteObj.get_id(), db, dh, null, true);
         } catch (CrmApiException e) {
-            throw new CrmApiException(String.format("%s[%s-%s]", e.getMessage(), db, dh));
+            String error = String.format("%s[报价单][%s-%s][%s]",
+                    Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, quoteObj.get_id());
+            logger.error(error, e);
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
         }
     }
 
-    private String saveToErp(BaojiadanReqEvent reqEvent) throws ErpDataException {
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws ErpDataException, CrmApiException {
+        BaojiadanReqEvent reqEvent = (BaojiadanReqEvent)event;
+
         String dh = getDanhao("QuoteObj");
         reqEvent.getQuoteObj().setField_kq20e__c("2101");
         reqEvent.getQuoteObj().setField_SS32r__c(dh);
@@ -88,7 +101,9 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
 
         AccountRespEvent respEvent = baojiadanService.save(reqEvent);
         if (respEvent.isSuccess()) {
-            return respEvent.getKhbh();
+            JobContextHolder.getContext().setSerialNo(String.format("%s-%s",
+                    reqEvent.getQuoteObj().getField_kq20e__c(), reqEvent.getQuoteObj().getField_SS32r__c()));
+            return respEvent;
         }
 
         throw new ErpDataException("保存到Erp失败 - " + respEvent.getMessage());
@@ -98,15 +113,17 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException {
         Debug("***获取报价单信息[DataId={}]", jobDetail.getDataId());
         QuoteObj quoteObj = quoteObjService.loadById(jobDetail.getDataId());
-        JobContextHolder.setType("报价单");
-        JobContextHolder.setSerialNo(quoteObj.getName());
-        JobContextHolder.setOwner(quoteObj.getOwner());
+        JobContextHolder.getContext().setType("报价单");
+        JobContextHolder.getContext().setSerialNo(quoteObj.getName());
+        JobContextHolder.getContext().setOwner(quoteObj.getOwner());
 
-        if (!StringUtils.isEmpty(quoteObj.getField_SS32r__c()) && !isDevMode()) {
-            Debug("***报价单已对接过[{}-{}]", quoteObj.getField_kq20e__c(), quoteObj.getField_SS32r__c());
+        Object_1sCfv__c baojiadanDj = baojiadanDjService.getSuccess(quoteObj.get_id());
+        if (baojiadanDj != null && !isDevMode()) {
+            String db = baojiadanDj.getField_GI813__c();
+            String dh = baojiadanDj.getField_88n41__c();
+            Debug("***报价单已对接过[{}-{}]", db, dh);
             throw new CrmDataException(Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.code,
-                    String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg,
-                            quoteObj.getField_kq20e__c(), quoteObj.getField_SS32r__c()));
+                    String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg, db, dh));
         }
 
         //含税说明

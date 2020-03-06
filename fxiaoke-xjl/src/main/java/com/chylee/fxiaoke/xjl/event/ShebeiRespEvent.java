@@ -1,7 +1,7 @@
 package com.chylee.fxiaoke.xjl.event;
 
 import com.chylee.fxiaoke.common.event.ResponseEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.DeviceObj;
+import com.chylee.fxiaoke.xjl.event.data.object.DeviceObj;
 
 import java.util.List;
 

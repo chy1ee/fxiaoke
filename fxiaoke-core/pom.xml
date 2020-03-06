@@ -15,12 +15,12 @@
         <dependency>
             <groupId>com.chylee</groupId>
             <artifactId>fxiaoke-common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.chylee</groupId>
             <artifactId>fxiaoke-security-starter</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

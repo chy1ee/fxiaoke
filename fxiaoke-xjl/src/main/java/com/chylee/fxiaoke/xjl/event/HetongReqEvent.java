@@ -1,7 +1,7 @@
 package com.chylee.fxiaoke.xjl.event;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_47F7O__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_snPZx__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_47F7O__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_snPZx__c;
 
 public class HetongReqEvent extends AccountReqEvent {
 

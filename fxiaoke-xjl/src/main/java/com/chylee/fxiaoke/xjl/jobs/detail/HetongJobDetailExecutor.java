@@ -1,7 +1,8 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.*;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.xjl.event.data.object.*;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
@@ -22,21 +23,23 @@ import java.util.List;
 @Component
 public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
     private final ErpHetongService hetongService;
-    private final FxkObjectSnPZxService objectSnPZxService;
-    private final FxkObject47F7OService object47F7OService;
+    private final FxkHetongService hetongService2;
+    private final FxkHetongDjService hetongDjService;
+    private final FxkHetongMxService hetongMxService;
     private final FxkProductObjService productObjService;
     private final FxkSPUObjServiceImpl spuObjService;
 
     protected HetongJobDetailExecutor(JobDetailService jobDetailService, SysReportService reportService,
                                       FXKSequenceService sequenceService, FxkAccountService accountService,
                                       FxkContactService contactObjService, FxkAccountAddrService accountAddrService,
-                                      ErpHetongService erpHetongService, FxkObjectSnPZxService fxkObjectSnPZxService,
-                                      FxkObject47F7OService object47F7OService, FxkProductObjService productObjService,
-                                      FxkSPUObjServiceImpl spuObjService) {
+                                      ErpHetongService erpHetongService, FxkHetongService hetongService2,
+                                      FxkHetongDjService hetongDjService, FxkHetongMxService hetongMxService,
+                                      FxkProductObjService productObjService, FxkSPUObjServiceImpl spuObjService) {
         super(jobDetailService, reportService, sequenceService, accountService, contactObjService, accountAddrService);
         this.hetongService = erpHetongService;
-        this.objectSnPZxService = fxkObjectSnPZxService;
-        this.object47F7OService = object47F7OService;
+        this.hetongService2 = hetongService2;
+        this.hetongDjService = hetongDjService;
+        this.hetongMxService = hetongMxService;
         this.productObjService = productObjService;
         this.spuObjService = spuObjService;
     }
@@ -47,21 +50,25 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
     }
 
     @Override
-    protected void saveEvent(Event event) throws ErpDataException, CrmApiException {
-        HetongReqEvent reqEvent = (HetongReqEvent)event;
-        String khbh = saveToErp(reqEvent);
-        if (isDevMode())
-            Debug("开发模式不回写CRM");
-        else
-            saveToCrm(khbh, reqEvent);
-
-        JobContextHolder.setSerialNo(String.format("%s-%s",
-                reqEvent.getHt().getField_d91gZ__c(), reqEvent.getHt().getField_WCjgL__c()));
-        JobContextHolder.setSuccess();
+    protected void writeErrorTo(String dataId, String error) {
+        Object_snPZx__c toUpdate = new Object_snPZx__c();
+        toUpdate.setDataObjectApiName("object_snPZx__c");
+        toUpdate.set_id(dataId);
+        toUpdate.setField_WCjgL__c(error);
+        try {
+            hetongService2.save(toUpdate);
+        } catch (Exception e) {
+            logger.error(error, e);
+        }
     }
 
-    private void saveToCrm(String khbh, HetongReqEvent reqEvent ) throws CrmApiException {
+   @Override
+    protected void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException {
+        HetongReqEvent reqEvent = (HetongReqEvent)event;
+        AccountRespEvent respEvent = (AccountRespEvent)resp;
+
         //回写客户编号CRM保存结果
+        String khbh = respEvent.getKhbh();
         if (khbh != null) {
             String accountId = reqEvent.getAccountObj().get_id();
             Debug("开始回写客户编号：{}-{}", accountId, khbh);
@@ -79,13 +86,18 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
         toUpdate.setField_d91gZ__c(db);
         toUpdate.setField_WCjgL__c(dh);
         try {
-            objectSnPZxService.save(toUpdate);
+            hetongService2.save(toUpdate);
         } catch (Exception e) {
-            throw new CrmApiException(String.format("%s[%s-%s]", e.getMessage(), db, dh));
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code,
+                    String.format("%s[合同][%s-%s][%s]", Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, ht.get_id())
+            );
         }
     }
 
-    private String saveToErp(HetongReqEvent reqEvent) throws ErpDataException {
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws ErpDataException, CrmApiException {
+        HetongReqEvent reqEvent = (HetongReqEvent)event;
+
         String htbh = getDanhao("Object_snPZx__c");
 
         //处理单别单号
@@ -94,25 +106,29 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
         reqEvent.getHtmx().setAB002(htbh);
 
         AccountRespEvent respEvent = hetongService.save(reqEvent);
-        if (respEvent.isSuccess())
-            return respEvent.getKhbh();
+        if (respEvent.isSuccess()) {
+            JobContextHolder.getContext().setSerialNo(String.format("%s-%s",
+                    reqEvent.getHt().getField_d91gZ__c(), reqEvent.getHt().getField_WCjgL__c()));
+            return respEvent;
+        }
 
         throw new ErpDataException("保存到Erp失败 - " + respEvent.getMessage());
     }
 
     @Override
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException, ErpDataException {
-        Object_snPZx__c ht = objectSnPZxService.loadById(jobDetail.getDataId());
-        JobContextHolder.setType("合同");
-        JobContextHolder.setSerialNo(ht.getName());
-        JobContextHolder.setOwner(ht.getOwner());
+        Object_snPZx__c ht = hetongService2.loadById(jobDetail.getDataId());
+        JobContextHolder.getContext().setType("合同");
+        JobContextHolder.getContext().setSerialNo(ht.getName());
+        JobContextHolder.getContext().setOwner(ht.getOwner());
 
-        Debug("***owner = {}", ht.getOwner());
-
-        if (!StringUtils.isEmpty(ht.getField_WCjgL__c()) && !isDevMode()) {
-            Debug("合同已对接过，合同单号：{}", ht.getField_WCjgL__c());
+        Object_qlu3s__c hetongDj = hetongDjService.getSuccess(ht.get_id());
+        if (hetongDj != null && !isDevMode()) {
+            String db = hetongDj.getField_161LU__c();
+            String dh = hetongDj.getField_55sOU__c();
+            Debug("合同已对接过，合同单号：{}-{}", db, dh);
             throw new CrmDataException(Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.code,
-                    Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg);
+                    String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg, db, dh));
         }
 
         AccountReqEvent accountReqEvent = getAccountReqEvent(ht.getField_67u8b__c());
@@ -127,7 +143,7 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
             ht.setAA009(accountReqEvent.getContactObj().getName());
 
 
-        List<Object_47F7O__c> htmxs = object47F7OService.listByHtId(ht.get_id());
+        List<Object_47F7O__c> htmxs = hetongMxService.listByHtId(ht.get_id());
 
         HetongReqEvent reqEvent = handleTsxq(ht, htmxs);
         reqEvent.assign(accountReqEvent);
@@ -136,7 +152,6 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
     }
 
     private HetongReqEvent handleTsxq(Object_snPZx__c ht, List<Object_47F7O__c> htmxs) throws CrmDataException, CrmApiException {
-        int index;
         StringBuilder tsxq = new StringBuilder();
 
         if (!StringUtils.isEmpty(ht.getField_gri58__c())) {

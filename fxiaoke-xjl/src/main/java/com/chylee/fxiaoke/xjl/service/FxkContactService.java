@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.xjl.service;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ContactObj;
+import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 
 import java.util.List;

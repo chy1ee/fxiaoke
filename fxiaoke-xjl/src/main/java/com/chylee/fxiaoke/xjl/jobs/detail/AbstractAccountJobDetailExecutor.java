@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountAddrObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ContactObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountAddrObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 import com.chylee.fxiaoke.common.service.JobDetailService;

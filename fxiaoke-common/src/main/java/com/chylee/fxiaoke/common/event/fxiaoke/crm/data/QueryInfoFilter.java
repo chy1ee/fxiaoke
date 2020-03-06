@@ -5,26 +5,26 @@ import java.util.List;
 
 public class QueryInfoFilter {
     private String field_name;
-    private List<String> field_values;
+    private List<Object> field_values;
     private String operator;
 
     public QueryInfoFilter() {
 
     }
 
-    public QueryInfoFilter(String fieldName, String fieldValue) {
+    public QueryInfoFilter(String fieldName, Object fieldValue) {
         this(fieldName, fieldValue, "EQ");
     }
 
-    public QueryInfoFilter(String fieldName, String fieldValue, String operator) {
-        List<String> fieldValues = new ArrayList<>();
+    public QueryInfoFilter(String fieldName, Object fieldValue, String operator) {
+        List<Object> fieldValues = new ArrayList<>();
         fieldValues.add(fieldValue);
         this.field_name = fieldName;
         this.field_values = fieldValues;
         this.operator = operator;
     }
 
-    public QueryInfoFilter(String fieldName, List<String> fieldValues, String operator) {
+    public QueryInfoFilter(String fieldName, List<Object> fieldValues, String operator) {
         this.field_name = fieldName;
         this.field_values = fieldValues;
         this.operator = operator;
@@ -38,11 +38,11 @@ public class QueryInfoFilter {
         this.field_name = field_name;
     }
 
-    public List<String> getField_values() {
+    public List<Object> getField_values() {
         return field_values;
     }
 
-    public void setField_values(List<String> field_values) {
+    public void setField_values(List<Object> field_values) {
         this.field_values = field_values;
     }
 

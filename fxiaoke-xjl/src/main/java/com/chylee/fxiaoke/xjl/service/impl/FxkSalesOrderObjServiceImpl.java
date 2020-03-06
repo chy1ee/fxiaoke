@@ -2,8 +2,8 @@ package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.SalesOrderObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.SalesOrderProductObj;
+import com.chylee.fxiaoke.xjl.event.data.object.SalesOrderObj;
+import com.chylee.fxiaoke.xjl.event.data.object.SalesOrderProductObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;

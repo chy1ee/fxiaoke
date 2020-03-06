@@ -2,7 +2,7 @@ package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;
@@ -71,10 +71,6 @@ public class FxkAccountServiceImpl extends AbstractCrmServiceImpl implements Fxk
             accountObj.setField_PlekP__c(
                     objectService.selectOneMap("AccountObj", "field_PlekP__c").loadByLabel(accountObj.getField_PlekP__c()));
         }
-
-        //开发环境清空客户编号，以便同步资料
-        if (isDevMode())
-            accountObj.setField_AlGoN__c(null);
 
         return accountObj;
     }

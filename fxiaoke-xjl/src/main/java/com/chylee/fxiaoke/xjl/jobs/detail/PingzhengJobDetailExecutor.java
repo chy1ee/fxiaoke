@@ -2,8 +2,9 @@ package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
 import com.chylee.fxiaoke.common.event.ResponseEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_79pYP__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_okom1__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_79pYP__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_h18X2__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_okom1__c;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
@@ -13,11 +14,7 @@ import com.chylee.fxiaoke.common.api.Constants;
 import com.chylee.fxiaoke.core.service.FXKSequenceService;
 import com.chylee.fxiaoke.xjl.event.PingzhengReqEvent;
 import com.chylee.fxiaoke.common.jobs.JobContextHolder;
-import com.chylee.fxiaoke.xjl.service.ErpPingzhengService;
-import com.chylee.fxiaoke.xjl.service.FxkAccountService;
-import com.chylee.fxiaoke.xjl.service.FxkObject79pYPService;
-import com.chylee.fxiaoke.xjl.service.FxkPersonnelObjService;
-import com.chylee.fxiaoke.xjl.service.impl.FxkObjectOkom1ServiceImpl;
+import com.chylee.fxiaoke.xjl.service.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,49 +24,53 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     private final ErpPingzhengService pingzhengService;
     private final FxkAccountService accountService;
     private final FxkPersonnelObjService personnelObjService;
-    private final FxkObjectOkom1ServiceImpl objectOkom1Service;
-    private final FxkObject79pYPService object79pYPService;
+    private final FxkBaoxiaoService baoxiaoService;
+    private final FxkBaoxiaoMxService baoxiaoMxService;
+    private final FxkBaoxiaoDjService baoxiaoDjService;
 
     protected PingzhengJobDetailExecutor(JobDetailService jobDetailService, SysReportService reportService,
-                                         FXKSequenceService sequenceService, ErpPingzhengService pingzhengService, FxkAccountService accountService, FxkPersonnelObjService personnelObjService, FxkObjectOkom1ServiceImpl objectOkom1Service, FxkObject79pYPService object79pYPService) {
+                                         FXKSequenceService sequenceService, ErpPingzhengService pingzhengService,
+                                         FxkAccountService accountService, FxkPersonnelObjService personnelObjService,
+                                         FxkBaoxiaoService baoxiaoService, FxkBaoxiaoMxService baoxiaoMxService,
+                                         FxkBaoxiaoDjService baoxiaoDjService) {
         super(jobDetailService, reportService, sequenceService);
         this.pingzhengService = pingzhengService;
         this.accountService = accountService;
         this.personnelObjService = personnelObjService;
-        this.objectOkom1Service = objectOkom1Service;
-        this.object79pYPService = object79pYPService;
+        this.baoxiaoService = baoxiaoService;
+        this.baoxiaoMxService = baoxiaoMxService;
+        this.baoxiaoDjService = baoxiaoDjService;
     }
 
     @Override
-    protected void saveEvent(Event event) throws ErpDataException, CrmApiException {
-        PingzhengReqEvent reqEvent = (PingzhengReqEvent)event;
-        saveToErp(reqEvent);
-        if (isDevMode())
-            Debug("开发模式不回写CRM");
-        else
-            saveToCrm(reqEvent);
-
-        JobContextHolder.setSerialNo(String.format("%s-%s", reqEvent.getPz().getField_8GijD__c(), reqEvent.getPz().getField_EHyt1__c()));
-        JobContextHolder.setSuccess();
-    }
-
-    private void saveToCrm(PingzhengReqEvent reqEvent) throws CrmApiException {
-        Object_okom1__c pz = reqEvent.getPz();
-        String dh = pz.getField_EHyt1__c();
-        String db = pz.getField_8GijD__c();
-        Object_okom1__c toUpdate = new Object_okom1__c();
-        toUpdate.setDataObjectApiName("object_okom1__c");
-        toUpdate.set_id(pz.get_id());
-        toUpdate.setField_EHyt1__c(dh);
-        toUpdate.setField_8GijD__c(db);
+    protected void writeErrorTo(String dataId, String error) {
         try {
-            objectOkom1Service.save(pz);
+            baoxiaoDjService.save(dataId, null, null, error, false);
         } catch (Exception e) {
-            throw new CrmApiException(String.format("%s[%s-%s]", e.getMessage(), db, dh));
+            logger.error(error, e);
         }
     }
 
-    private void saveToErp(PingzhengReqEvent reqEvent) throws ErpDataException {
+    @Override
+    protected void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException {
+        PingzhengReqEvent reqEvent = (PingzhengReqEvent)event;
+
+        Object_okom1__c pz = reqEvent.getPz();
+        String dh = pz.getField_EHyt1__c();
+        String db = pz.getField_8GijD__c();
+        try {
+            baoxiaoDjService.save(pz.get_id(), db, dh, null, true);
+        } catch (Exception e) {
+            String error = String.format("%s[报价单][%s-%s][%s]",
+                    Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, pz.get_id());
+            logger.error(error, e);
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
+        }
+    }
+
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws ErpDataException {
+        PingzhengReqEvent reqEvent = (PingzhengReqEvent)event;
         Object_okom1__c pz = reqEvent.getPz();
 
         String pzbh = getDanhao("Object_okom1__c");
@@ -79,20 +80,24 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         ResponseEvent respEvent = pingzhengService.save(reqEvent);
         if (!respEvent.isSuccess())
             throw new ErpDataException("保存一般凭证失败 - " + respEvent.getMessage());
+
+        return respEvent;
     }
 
     @Override
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException {
-        Object_okom1__c pz = objectOkom1Service.loadById(jobDetail.getDataId());
-        JobContextHolder.setType("报销单");
-        JobContextHolder.setSerialNo(pz.getName());
-        JobContextHolder.setOwner(pz.getOwner());
+        Object_okom1__c pz = baoxiaoService.loadById(jobDetail.getDataId());
+        JobContextHolder.getContext().setType("报销单");
+        JobContextHolder.getContext().setSerialNo(pz.getName());
+        JobContextHolder.getContext().setOwner(pz.getOwner());
 
-        if (!StringUtils.isEmpty(pz.getField_8GijD__c()) && !isDevMode()) {
-            Debug("报销单已对接过，报销单号：{}-{}", pz.getField_EHyt1__c(), pz.getField_8GijD__c());
+        Object_h18X2__c baoxiaoDj = baoxiaoDjService.getSuccess(pz.get_id());
+        if (baoxiaoDj != null && !isDevMode()) {
+            String db = baoxiaoDj.getField_1r0bN__c();
+            String dh = baoxiaoDj.getField_g6j6m__c();
+            Debug("报销单已对接过，报销单号：{}-{}", db, dh);
             throw new CrmDataException(Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.code,
-                    String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg,
-                            pz.getField_EHyt1__c(), pz.getField_8GijD__c()));
+                    String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg, db, dh));
         }
 
         //客户
@@ -102,7 +107,7 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         //报销人
         pz.setField_N7e3j__c(personnelObjService.getNumberByOpenId(pz.getOwner().get(0)));
 
-        List<Object_79pYP__c> pzmxs = object79pYPService.listByPzId(pz.get_id());
+        List<Object_79pYP__c> pzmxs = baoxiaoMxService.listByPzId(pz.get_id());
 
         PingzhengReqEvent reqEvent = new PingzhengReqEvent();
         reqEvent.setPz(pz);

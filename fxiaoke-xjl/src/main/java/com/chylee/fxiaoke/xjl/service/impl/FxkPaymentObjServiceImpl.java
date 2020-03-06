@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.OrderPaymentObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.PaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.OrderPaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.PaymentObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;
 import com.chylee.fxiaoke.xjl.service.FxkPaymentObjService;

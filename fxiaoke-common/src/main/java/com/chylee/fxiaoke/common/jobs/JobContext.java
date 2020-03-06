@@ -8,7 +8,12 @@ public class JobContext {
     private String serialNo;
     private String error;
     private String type;
+    private int status;
     private List<String> owner;
+
+    public JobContext() {
+        status = -1;
+    }
 
     public String getSerialNo() {
         return serialNo;
@@ -50,8 +55,16 @@ public class JobContext {
         return success;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setSuccess() {
+        this.success = true;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @Override

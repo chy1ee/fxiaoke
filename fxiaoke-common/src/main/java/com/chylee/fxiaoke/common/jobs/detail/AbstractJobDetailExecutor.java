@@ -1,7 +1,9 @@
 package com.chylee.fxiaoke.common.jobs.detail;
 
 import com.chylee.fxiaoke.common.api.ComplieModeSupported;
+import com.chylee.fxiaoke.common.api.Constants;
 import com.chylee.fxiaoke.common.event.Event;
+import com.chylee.fxiaoke.common.event.ResponseEvent;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 import com.chylee.fxiaoke.common.exception.ErpDataException;
@@ -29,11 +31,23 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
     public boolean execute(JobDetail jobDetail) {
         try {
             invokeTask(jobDetail);
+            JobContextHolder.getContext().setSuccess();
             return true;
         } catch (Exception e) {
             String error;
             if (e instanceof ExecutorExcetpion) {
-                error = ((ExecutorExcetpion)e).getMsg();
+                ExecutorExcetpion excetpion = (ExecutorExcetpion)e;
+                error = excetpion.getMsg();
+
+                // 回填失败，不允许重发
+                if (excetpion.getCode() == Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code)
+                    JobContextHolder.getContext().setStatus(-2);
+                else {
+                    if (isDevMode())
+                        Debug("[开发模式]回写对接结果失败[{}][{}]", jobDetail.getDataId(), error);
+                    else
+                        writeErrorTo(jobDetail.getDataId(), error);
+                }
             }
             else if (e.getMessage() == null) {
                 error = "其他错误";
@@ -42,7 +56,7 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
                 error = e.getMessage();
             }
 
-            JobContextHolder.setError(error);
+            JobContextHolder.getContext().setError(error);
             return false;
         } finally {
             JobContext context = JobContextHolder.getContext();
@@ -54,7 +68,7 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
             //状态日志
             jobDetailService.upateStatusById(jobDetail.getId(),
-                    success ? 1 : -1,
+                    success ? 1 : context.getStatus(),
                     success ? seriaNo : error);
 
             //状态报告
@@ -73,10 +87,19 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
     protected void invokeTask(JobDetail jobDetail)
             throws CrmApiException, CrmDataException, ErpDataException {
-        saveEvent(createEvent(jobDetail));
+        Event event = createEvent(jobDetail);
+        ResponseEvent saveRespEvent = saveEvent(event);
+        if (isDevMode())
+            logger.debug("开发模式，不回写结果");
+        else
+            writeResultTo(event, saveRespEvent);
     }
 
-    protected abstract void saveEvent(Event event) throws ErpDataException, CrmDataException, CrmApiException;
+    protected abstract void writeErrorTo(String dataId, String error);
+
+    protected abstract void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException;
+
+    protected abstract ResponseEvent saveEvent(Event event) throws ErpDataException, CrmDataException, CrmApiException;
 
     protected abstract Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException, ErpDataException;
 

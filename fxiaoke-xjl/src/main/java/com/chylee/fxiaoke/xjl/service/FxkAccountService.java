@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.xjl.service;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
 import com.chylee.fxiaoke.common.exception.AccessTokenException;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;

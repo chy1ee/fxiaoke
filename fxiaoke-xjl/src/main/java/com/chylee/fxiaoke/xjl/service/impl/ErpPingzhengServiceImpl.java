@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.event.ResponseEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_79pYP__c;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.Object_okom1__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_79pYP__c;
+import com.chylee.fxiaoke.xjl.event.data.object.Object_okom1__c;
 import com.chylee.fxiaoke.common.util.DateUtils;
 import com.chylee.fxiaoke.xjl.event.PingzhengReqEvent;
 import com.chylee.fxiaoke.xjl.mapper.ActtaMapper;

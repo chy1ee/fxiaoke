@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.chylee</groupId>
             <artifactId>fxiaoke-common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -2,8 +2,7 @@ package com.chylee.fxiaoke.quartz.jobs;
 
 import com.chylee.fxiaoke.core.model.JobType;
 import com.chylee.fxiaoke.core.service.JobTypeService;
-import com.chylee.fxiaoke.common.service.SysReportService;
-import com.chylee.fxiaoke.quartz.SpringQuartzJob;
+import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
 import com.chylee.fxiaoke.common.jobs.log.JobLogExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

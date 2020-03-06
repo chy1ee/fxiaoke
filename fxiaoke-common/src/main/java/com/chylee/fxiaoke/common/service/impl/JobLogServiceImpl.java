@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class JobLogServiceImpl extends ComplieModeSupported implements JobLogService {
+public class JobLogServiceImpl implements JobLogService {
 
     private final JobLogMapper logMapper;
 
@@ -36,11 +36,6 @@ public class JobLogServiceImpl extends ComplieModeSupported implements JobLogSer
         }
         else {
             JobLog last = logMapper.selectById(maxId);
-
-            //开发模式只取最后一个任务
-            if (isDevMode())
-                return last;
-
             current.setStartTime(last.getEndTime());
         }
         current.setQrtzId(qrtzId);

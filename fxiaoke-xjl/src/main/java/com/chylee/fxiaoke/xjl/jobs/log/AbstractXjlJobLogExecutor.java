@@ -29,12 +29,6 @@ public abstract class AbstractXjlJobLogExecutor extends AbstractJobLogExecutor {
         DbnowRespEvent respEvent = assistantService.dbnow();
         if (respEvent.isSuccess()) {
             Date now = respEvent.getNow();
-            if (isDevMode()) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(now);
-                calendar.add(Calendar.DAY_OF_MONTH, -1);
-                now = calendar.getTime();
-            }
             return now;
         }
 

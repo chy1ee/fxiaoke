@@ -1,7 +1,7 @@
 package com.chylee.fxiaoke.xjl.service;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.OrderPaymentObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.PaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.OrderPaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.PaymentObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 
 import java.util.List;

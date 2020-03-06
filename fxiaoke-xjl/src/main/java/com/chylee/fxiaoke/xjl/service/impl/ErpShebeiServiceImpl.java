@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.xjl.service.impl;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.DeviceObj;
+import com.chylee.fxiaoke.xjl.event.data.object.DeviceObj;
 import com.chylee.fxiaoke.xjl.event.ErpJobRespEvent;
 import com.chylee.fxiaoke.xjl.event.ShebeiRespEvent;
 import com.chylee.fxiaoke.xjl.mapper.CoptgMapper;

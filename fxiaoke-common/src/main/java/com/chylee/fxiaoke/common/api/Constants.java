@@ -15,11 +15,9 @@ public class Constants {
     public enum interfaceResponseCode {
 
         EXECUTOR_IGNORED_SYNCHRONIZE(20001, "数据已对接过，如果需要重新对接，请清空CRM的单号单别并重置任务"),
-
+        EXECUTOR_WRITE_BACK_ERROR(20002, "对接成功，回写单别和单号失败"),
         FXK_APP_ACCESS_TOKEN_EXPIRED(20005, "appAccessToken不存在或者已经过期"),
-
         FXK_CORP_ACCESS_TOKEN_EXPIRED(20016, "corpAccessToken不存在或者已经过期"),
-
         FXK_POST_JSON_CONVERT_ERROR(20020, "JSON转个成对象失败");
 
         public int code;

@@ -2,7 +2,7 @@ package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountAddrObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountAddrObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;
 import com.chylee.fxiaoke.xjl.service.FxkAccountAddrService;

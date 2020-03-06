@@ -1,7 +1,7 @@
 package com.chylee.fxiaoke.xjl.service;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.SalesOrderObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.SalesOrderProductObj;
+import com.chylee.fxiaoke.xjl.event.data.object.SalesOrderObj;
+import com.chylee.fxiaoke.xjl.event.data.object.SalesOrderProductObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 
 import java.util.List;

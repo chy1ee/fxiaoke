@@ -73,13 +73,14 @@ public class FXiaokeApi extends ComplieModeSupported {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String jsonToPost = mapper.writeValueAsString(reqEvent);
-//            if(logger.isDebugEnabled())
-//                logger.debug("request: {}, reqEvent: {}", url, jsonToPost);
+
+            if(logger.isDebugEnabled())
+                logger.debug("url: {}, reqEvent: {}", url, jsonToPost);
 
             HttpResponseMessageVO resp = HttpTookit.sendPostByJson(apiUrl + url, jsonToPost);
 
-//            if(logger.isDebugEnabled())
-//                logger.debug("request = {},respEvent = {}", url, resp.toString());
+            if(logger.isDebugEnabled())
+                logger.debug("url = {},respEvent = {}", url, resp.toString());
 
             if ("200".equals(resp.getHttpCode())) {
                 result.setData(resp.getContent());

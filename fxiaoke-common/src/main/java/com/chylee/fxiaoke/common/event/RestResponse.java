@@ -41,7 +41,11 @@ public class RestResponse {
             return failure(chyleeException.getCode(), chyleeException.getMessage());
         }
 
-        return failure(-1, "未知错误");
+        String error = e.getMessage();
+        if (error == null)
+            error = "未知错误";
+
+        return failure(-1, error);
     }
 
     public static ResponseEvent failure(int code) {

@@ -14,12 +14,17 @@ public interface JobDetailMapper {
     @Update("update job_detail set status=#{status},error=#{error},last_time=current_timestamp where id=#{id}")
     void updateStatusById(JobDetail detail);
 
+    @Update("update job_detail set dz=#{dz} where id=#{id}")
+    void updateDzById(@Param("id") int id, @Param("dz") String dz);
+
     @Select("select count(*) from job_detail where status = -1")
     int errorCount();
 
     void insertBatch(@Param("queueList") List<JobDetail> jobQueueList);
 
     List<JobDetail> listByStatus0(@Param("pageSize") int pageSize);
+
+    List<JobDetail> listAll(@Param("id") int id, @Param("typeId") int typeId);
 
     int count(@Param("logId") int logId, @Param("valid") int valid);
 

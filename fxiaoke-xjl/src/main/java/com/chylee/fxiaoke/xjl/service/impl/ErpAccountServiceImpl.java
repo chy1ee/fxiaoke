@@ -1,9 +1,10 @@
 package com.chylee.fxiaoke.xjl.service.impl;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountAddrObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.AccountObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.ContactObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountAddrObj;
+import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
+import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
 import com.chylee.fxiaoke.common.util.DateUtils;
+import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.xjl.event.AccountReqEvent;
 import com.chylee.fxiaoke.xjl.event.AccountRespEvent;
 import com.chylee.fxiaoke.xjl.mapper.CopmaMapper;
@@ -31,6 +32,24 @@ public class ErpAccountServiceImpl implements ErpAccountService {
     @Override
     @Transactional("xjlTransactionManager")
     public AccountRespEvent save(AccountReqEvent reqEvent) {
+        AccountObj accountObj = reqEvent.getAccountObj();
+
+        if (accountObj == null)
+            return new AccountRespEvent("保存客户信息失败：客户不允许为空");
+
+        //客户编码为空
+        if (StringUtils.isEmpty(accountObj.getField_AlGoN__c()))
+            return addKehu(reqEvent);
+        else
+            return updateKehu(reqEvent);
+    }
+
+    private AccountRespEvent updateKehu(AccountReqEvent reqEvent) {
+        logger.debug("暂未实现更新客户逻辑");
+        return new AccountRespEvent();
+    }
+
+    private AccountRespEvent addKehu(AccountReqEvent reqEvent) {
         AccountObj accountObj = reqEvent.getAccountObj();
 
         if(accountObj.getField_PlekP__c() == null || accountObj.getField_PlekP__c().length() != 2)

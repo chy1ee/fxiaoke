@@ -1,7 +1,7 @@
 package com.chylee.fxiaoke.quartz;
 
+import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
 import com.chylee.fxiaoke.common.service.SysReportService;
-import com.chylee.fxiaoke.core.mapper.QrtzLogMapper;
 import com.chylee.fxiaoke.core.model.QrtzJob;
 import com.chylee.fxiaoke.core.model.QrtzLog;
 import com.chylee.fxiaoke.core.service.QrtzLogService;
@@ -19,7 +19,7 @@ public class SpringQuartzJobBean extends QuartzJobBean {
     private final QrtzLogService logService;
 
     public SpringQuartzJobBean(SpringQuartzJobLoader springQuartzJobLoader, SysReportService reportService,
-                               QrtzLogMapper qrtzLogMapper, QrtzLogService logService) {
+                               QrtzLogService logService) {
         this.springQuartzJobLoader = springQuartzJobLoader;
         this.reportService = reportService;
         this.logService = logService;
@@ -50,15 +50,15 @@ public class SpringQuartzJobBean extends QuartzJobBean {
                 return;
             }
 
-//            String[] ids = childIds.split(",");
-//            for (String id : ids) {
-//                try {
-//                    springQuartzJobLoader.triggerJob(Integer.parseInt(id));
-//                } catch (SchedulerException e) {
-//                    qrtzLogMapper.updateEndtimeById(qrtzLog.getId(), e.getMessage());
-//                    throw new JobExecutionException(e);
-//                }
-//            }
+            String[] ids = childIds.split(",");
+            for (String id : ids) {
+                try {
+                    springQuartzJobLoader.triggerJob(Integer.parseInt(id));
+                } catch (SchedulerException e) {
+                    writeLog(qrtzLog.getId(), e);
+                    throw new JobExecutionException(e);
+                }
+            }
 
             writeLog(qrtzLog.getId(), null);
         }

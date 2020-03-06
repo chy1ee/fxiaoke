@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.event;
 
 import com.chylee.fxiaoke.common.event.ResponseEvent;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.OrderPaymentObj;
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.PaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.OrderPaymentObj;
+import com.chylee.fxiaoke.xjl.event.data.object.PaymentObj;
 
 import java.util.List;
 

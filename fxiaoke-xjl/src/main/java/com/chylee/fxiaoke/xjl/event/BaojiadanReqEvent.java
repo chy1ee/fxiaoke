@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.xjl.event;
 
-import com.chylee.fxiaoke.common.event.fxiaoke.data.object.*;
+import com.chylee.fxiaoke.xjl.event.data.object.*;
 
 
 public class BaojiadanReqEvent extends AccountReqEvent {

@@ -53,7 +53,7 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
         reqEvent.setMsgType("text");
         reqEvent.setText(new Content(content));
 
-        reportMapper.insert(new FxkReport(0, null, null, reqEvent.getToUser().get(0), content));
+        saveReport(null, null, null, reqEvent.getToUser());
 
         return "dev".equals(profiles) ?  new MsgRespEvent() :
                 doPost("/cgi/message/send", reqEvent, MsgRespEvent.class);
@@ -80,6 +80,8 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
 
         if (toUser == null || toUser.isEmpty())
             reqEvent.setToUser(configuration.getAdminOpenIds());
+        else if (error == null)
+            reqEvent.setToUser(toUser);
         else {
             reqEvent.setToUser(Stream.of(toUser, configuration.getAdminOpenIds())
                     .flatMap(Collection::stream)
@@ -90,9 +92,21 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
         reqEvent.setMsgType("composite");
         reqEvent.setComposite(composite);
 
-        reportMapper.insert(new FxkReport(0, type, serial, reqEvent.getToUser().get(0), error));
+
+
+        saveReport(type, serial, error, reqEvent.getToUser());
 
         return "dev".equals(profiles) ?  new MsgRespEvent() :
                 doPost("/cgi/message/send", reqEvent, MsgRespEvent.class);
+    }
+
+    private void saveReport(String type, String serial, String error, List<String> toUser) {
+        StringBuilder builder = new StringBuilder();
+        for (int i=0,j=toUser.size();i<j&&i<5;i++) {
+            builder.append(toUser.get(i));
+            if (i > 0)
+                builder.append(",");
+        }
+        reportMapper.insert(new FxkReport(0, type, serial, builder.toString(), error));
     }
 }

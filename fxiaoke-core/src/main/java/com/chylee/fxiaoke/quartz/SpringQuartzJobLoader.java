@@ -1,5 +1,6 @@
 package com.chylee.fxiaoke.quartz;
 
+import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
 import com.chylee.fxiaoke.core.mapper.QrtzJobMapper;
 import com.chylee.fxiaoke.core.model.QrtzJob;
 import org.quartz.Scheduler;

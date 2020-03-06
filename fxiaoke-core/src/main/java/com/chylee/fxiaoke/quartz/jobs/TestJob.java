@@ -1,6 +1,6 @@
 package com.chylee.fxiaoke.quartz.jobs;
 
-import com.chylee.fxiaoke.quartz.SpringQuartzJob;
+import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
