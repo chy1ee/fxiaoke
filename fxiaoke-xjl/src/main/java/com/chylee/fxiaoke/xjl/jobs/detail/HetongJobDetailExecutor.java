@@ -2,6 +2,7 @@ package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
 import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.common.jobs.JobContext;
 import com.chylee.fxiaoke.xjl.event.data.object.*;
 import com.chylee.fxiaoke.common.exception.*;
 import com.chylee.fxiaoke.common.model.JobDetail;
@@ -68,12 +69,12 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
         AccountRespEvent respEvent = (AccountRespEvent)resp;
 
         //回写客户编号CRM保存结果
-        String khbh = respEvent.getKhbh();
-        if (khbh != null) {
-            String accountId = reqEvent.getAccountObj().get_id();
-            Debug("开始回写客户编号：{}-{}", accountId, khbh);
-            updateAccountKhbh(accountId, khbh);
-        }
+       //回写客户编号CRM保存结果
+       if(respEvent.isCreate()) {
+           updateAccountKhbh(reqEvent.getAccountObj().get_id(),
+                   StringUtils.trim(respEvent.getCopma().getMA001(), false),
+                   respEvent.getCopma().getMA003());
+       }
 
         //回写单号单别
         Object_snPZx__c ht = reqEvent.getHt();
@@ -118,9 +119,12 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
     @Override
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException, ErpDataException {
         Object_snPZx__c ht = hetongService2.loadById(jobDetail.getDataId());
-        JobContextHolder.getContext().setType("合同");
-        JobContextHolder.getContext().setSerialNo(ht.getName());
-        JobContextHolder.getContext().setOwner(ht.getOwner());
+
+        JobContext context = JobContextHolder.getContext();
+        context.setType("合同");
+        context.setSerialNo(ht.getName());
+        context.setOwner(ht.getOwner());
+        context.setMessage("CRM的合同[" + ht.getName() + "]已成功对接到易飞");
 
         Object_qlu3s__c hetongDj = hetongDjService.getSuccess(ht.get_id());
         if (hetongDj != null && !isDevMode()) {

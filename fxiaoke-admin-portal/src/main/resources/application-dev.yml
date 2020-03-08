@@ -10,8 +10,3 @@ spring:
       jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=XJL01;
       username: fxiaoke
       password: 123456
-
-logging:
-  level:
-    root: error
-    com.chylee: debug

@@ -39,8 +39,8 @@ public class FxkProductObjServiceImpl extends AbstractCrmServiceImpl implements 
         List<QueryInfoFilter> queryInfoFilters = new ArrayList<>();
         queryInfoFilters.add(new QueryInfoFilter("product_code", productCode));
         List<ProductObj> productObjs = this.queryDataObj("ProductObj", queryInfoFilters, false, ProductObj.class);
-        if (productObjs != null && !productObjs.isEmpty())
-            throw new CrmDataException("产品不存在不存在["+productCode+"]");
+        if (productObjs == null || productObjs.isEmpty())
+            throw new CrmDataException("产品不存在["+productCode+"]");
         return productObjs;
     }
 }

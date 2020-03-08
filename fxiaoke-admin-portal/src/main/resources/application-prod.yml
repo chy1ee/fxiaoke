@@ -5,8 +5,10 @@ spring:
       username: root
       password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
     xjl:
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      url: jdbc:sqlserver://192.168.10.5:1433;databaseName=XJL;
+      jdbc-url: jdbc:sqlserver://192.168.10.5:1433;databaseName=XJL;
       username: fxiaoke
       password: 123456
+      type: com.alibaba.druid.pool.DruidDataSource

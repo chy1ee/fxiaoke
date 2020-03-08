@@ -3,17 +3,10 @@ package com.chylee.fxiaoke.common.jobs;
 import java.util.List;
 
 public class JobContext {
-    private boolean success = false;
-
     private String serialNo;
-    private String error;
+    private String message;
     private String type;
-    private int status;
     private List<String> owner;
-
-    public JobContext() {
-        status = -1;
-    }
 
     public String getSerialNo() {
         return serialNo;
@@ -23,12 +16,12 @@ public class JobContext {
         this.serialNo = serialNo;
     }
 
-    public String getError() {
-        return error;
+    public String getMessage() {
+        return message;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getType() {
@@ -51,28 +44,11 @@ public class JobContext {
         return type == null;
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess() {
-        this.success = true;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     @Override
     public String toString() {
         return "JobContext{" +
-                "success=" + success +
                 ", serialNo='" + serialNo + '\'' +
-                ", error='" + error + '\'' +
+                ", message='" + message + '\'' +
                 ", type='" + type + '\'' +
                 ", owner=" + owner +
                 '}';

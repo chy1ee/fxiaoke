@@ -52,10 +52,6 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
 
     @Override
     protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
-    }
-
-    @Override
-    protected ResponseEvent saveEvent(Event reqEvent) throws CrmApiException {
         DingdanRespEvent respEvent = (DingdanRespEvent)reqEvent;
 
         SalesOrderObj salesOrderObj = respEvent.getSalesOrderObj();
@@ -72,8 +68,11 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         detail.put("SalesOrderProductObj", list);
 
         salesOrderObjService.save(salesOrderObj, detail);
+    }
 
-        return new ResponseEvent();
+    @Override
+    protected ResponseEvent saveEvent(Event reqEvent) throws CrmApiException {
+        return null;
     }
 
     @Override
@@ -101,11 +100,12 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         JobContextHolder.getContext().setOwner(owner);
 
         //客户
-        AccountObj accountObj = accountService.loadById(respEvent.getSalesOrderObj().getAccount_id());
+        AccountObj accountObj = accountService.loadByKhbh(respEvent.getSalesOrderObj().getAccount_id());
         salesOrderObj.setAccount_id(accountObj.get_id());
 
         //联系人
         String shipToId = StringUtils.trim(salesOrderObj.getShip_to_id(), false);
+        Debug("联系人{}", shipToId);
         if (shipToId != null) {
             if ("".equals(shipToId))
                 salesOrderObj.setShip_to_id(null);
@@ -115,6 +115,7 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
                 String tel2 = StringUtils.trim(salesOrderObj.getShip_to_fax(), false);
 
                 List<ContactObj> contactObjs = contactService.listByAccounrIdAndName(accountId, shipToId);
+                Debug("联系人数量{}", contactObjs.size());
                 if (contactObjs == null || contactObjs.isEmpty()) {
                     ContactObj contactObj = new ContactObj();
                     contactObj.setDataObjectApiName("ContactObj");
@@ -125,8 +126,9 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
                     contactObj.setOwner(accountObj.getOwner());
                     contactService.save(contactObj);
                 }
-                else if (contactObjs.size() != 1) {
+                else {
                     ContactObj contactObjToUse = contactObjs.get(0);
+                    Debug(contactObjToUse.toString());
                     salesOrderObj.setShip_to_id(contactObjToUse.get_id());
                 }
             }

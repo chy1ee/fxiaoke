@@ -1,5 +1,6 @@
 package com.chylee.fxiaoke.xjl.jobs.detail;
 
+import com.chylee.fxiaoke.common.api.Constants;
 import com.chylee.fxiaoke.xjl.event.data.object.AccountAddrObj;
 import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
 import com.chylee.fxiaoke.xjl.event.data.object.ContactObj;
@@ -39,6 +40,8 @@ public abstract class AbstractAccountJobDetailExecutor extends AbstractXjlJobDet
         if (contactObjs == null || contactObjs.isEmpty())
             throw new CrmDataException("联系人不能为空[" + accountObj.getField_AlGoN__c() + "]");
 
+        Collections.sort(contactObjs);
+
         //联系地址
         List<AccountAddrObj> accountAddrObjs = accountAddrService.listAccountAddrByAccountId(accountObj.get_id());
         if (accountAddrObjs == null)
@@ -52,7 +55,20 @@ public abstract class AbstractAccountJobDetailExecutor extends AbstractXjlJobDet
         return reqEvent;
     }
 
-    protected void updateAccountKhbh(String accountId, String khbh) throws CrmApiException {
-        accountService.updateKhbhById(accountId,  khbh);
+    protected void updateAccountKhbh(String accountId, String khbh, String khmc) throws CrmApiException {
+        if (khbh == null) {
+            logger.error("易飞的客户编号为空[{}]", khmc);
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, "易飞的客户编号为空");
+        }
+
+        try {
+            accountService.updateKhbhById(accountId,  khbh);
+        }
+        catch(CrmApiException e) {
+            String error = String.format("%s[客户][%s][%s]",
+                    Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, khbh, accountId);
+            logger.error(error, e);
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
+        }
     }
 }

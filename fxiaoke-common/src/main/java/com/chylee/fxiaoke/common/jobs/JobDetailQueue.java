@@ -1,8 +1,12 @@
 package com.chylee.fxiaoke.common.jobs;
 
+import com.chylee.fxiaoke.common.model.JobDetail;
+import org.springframework.stereotype.Component;
+
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class JobDetailQueue <T> extends LinkedBlockingQueue<T> {
+@Component
+public class JobDetailQueue extends LinkedBlockingQueue<JobDetail> {
     private Object lock = new Object();
 
     private boolean finished;

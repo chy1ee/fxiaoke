@@ -29,9 +29,12 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
     @Override
     public boolean execute(JobDetail jobDetail) {
+        boolean success = false;
+        int status = -1;
         try {
             invokeTask(jobDetail);
-            JobContextHolder.getContext().setSuccess();
+            status = 1;
+            success = true;
             return true;
         } catch (Exception e) {
             String error;
@@ -41,7 +44,7 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
                 // 回填失败，不允许重发
                 if (excetpion.getCode() == Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code)
-                    JobContextHolder.getContext().setStatus(-2);
+                    status = -2;
                 else {
                     if (isDevMode())
                         Debug("[开发模式]回写对接结果失败[{}][{}]", jobDetail.getDataId(), error);
@@ -50,34 +53,35 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
                 }
             }
             else if (e.getMessage() == null) {
+                logger.error("未知错误", e);
                 error = "其他错误";
             }
             else {
                 error = e.getMessage();
             }
 
-            JobContextHolder.getContext().setError(error);
+            JobContextHolder.getContext().setMessage(error);
             return false;
         } finally {
             JobContext context = JobContextHolder.getContext();
-            boolean success = context.isSuccess();
             String seriaNo = context.getSerialNo();
-            String error = context.getError();
+            String message = context.getMessage();
 
             Debug(context.toString());
 
             //状态日志
             jobDetailService.upateStatusById(jobDetail.getId(),
-                    success ? 1 : context.getStatus(),
-                    success ? seriaNo : error);
+                    success ? 1 : status,
+                    success ? seriaNo : message);
 
             //状态报告
             if (!context.isEmpty()) {
                 reportService.sendExecutorReport(
                         context.getOwner(),
                         context.getType(),
-                        context.getSerialNo(),
-                        context.getError());
+                        seriaNo,
+                        success,
+                        message);
             }
 
             //释放jobCcontext
@@ -90,14 +94,14 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
         Event event = createEvent(jobDetail);
         ResponseEvent saveRespEvent = saveEvent(event);
         if (isDevMode())
-            logger.debug("开发模式，不回写结果");
+            Debug("开发模式，不回写结果");
         else
             writeResultTo(event, saveRespEvent);
     }
 
     protected abstract void writeErrorTo(String dataId, String error);
 
-    protected abstract void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException;
+    protected abstract void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException, ErpDataException;
 
     protected abstract ResponseEvent saveEvent(Event event) throws ErpDataException, CrmDataException, CrmApiException;
 
@@ -105,6 +109,6 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
     protected void Debug(String msg, Object... objects) {
         if (logger.isDebugEnabled())
-            logger.debug(msg, objects);
+            logger.debug("{}" + msg, "######", objects);
     }
 }

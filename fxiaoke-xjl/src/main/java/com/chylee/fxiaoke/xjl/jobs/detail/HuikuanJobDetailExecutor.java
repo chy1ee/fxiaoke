@@ -47,11 +47,7 @@ public class HuikuanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     }
 
     @Override
-    protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
-    }
-
-    @Override
-    protected ResponseEvent saveEvent(Event event) throws ErpDataException, CrmApiException {
+    protected void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException, ErpDataException {
         HuikuanRespEvent respEvent = (HuikuanRespEvent)event;
         PaymentObj paymentObj = respEvent.getPaymentObj();
         List<OrderPaymentObj> orderPaymentObjs = respEvent.getOrderPaymentObjs();
@@ -68,8 +64,11 @@ public class HuikuanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         }
 
         paymentObjService.save(paymentObj, detail);
+    }
 
-        return new ResponseEvent();
+    @Override
+    protected ResponseEvent saveEvent(Event event) throws ErpDataException, CrmApiException {
+        return null;
     }
 
     @Override

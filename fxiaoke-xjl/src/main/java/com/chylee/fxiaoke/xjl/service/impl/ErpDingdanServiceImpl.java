@@ -104,7 +104,10 @@ public class ErpDingdanServiceImpl implements ErpDingdanService {
                         BigDecimal.ROUND_HALF_UP).toString());    //折扣
         salesOrderProductObj.setRemark(StringUtils.trim(coptd.getTD020(), false));  //备注
         salesOrderProductObj.setProduct_price(coptd.getTD012());   //金额
-        salesOrderProductObj.setProduct_id(StringUtils.trim(coptd.getTD004(), false));  //产品名称  关联产品ID
+        String product_id = StringUtils.trim(coptd.getTD014(), false);
+        if (product_id == null)
+            product_id = StringUtils.trim(coptd.getTD004(), false);
+        salesOrderProductObj.setProduct_id(product_id);  //产品名称  关联产品ID
         salesOrderProductObj.setProduct_name(StringUtils.trim(coptd.getTD005(), false)); //产品名称
         salesOrderProductObj.setQuantity(coptd.getTD008());    //数量
         salesOrderProductObj.setUnit(StringUtils.trim(coptd.getTD010(), false));    //单位

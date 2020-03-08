@@ -2,6 +2,7 @@ package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
 import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.common.jobs.JobContext;
 import com.chylee.fxiaoke.xjl.event.data.object.AccountObj;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_1sCfv__c;
 import com.chylee.fxiaoke.xjl.event.data.object.QuoteLinesObj;
@@ -61,18 +62,10 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
         AccountRespEvent respEvent = (AccountRespEvent)resp;
 
         //回写客户编号CRM保存结果
-        String khbh = respEvent.getKhbh();
-        if(khbh != null) {
-            String accountId = reqEvent.getAccountObj().get_id();
-            try {
-                updateAccountKhbh(accountId, khbh);
-            }
-            catch(CrmApiException e) {
-                String error = String.format("%s[客户][%s][%s]",
-                        Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, khbh, accountId);
-                logger.error(error, e);
-                throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
-            }
+        if(respEvent.isCreate()) {
+            updateAccountKhbh(reqEvent.getAccountObj().get_id(),
+                    StringUtils.trim(respEvent.getCopma().getMA001(), false),
+                    respEvent.getCopma().getMA003());
         }
 
         //回写单号单别
@@ -111,17 +104,19 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
 
     @Override
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException {
-        Debug("***获取报价单信息[DataId={}]", jobDetail.getDataId());
+        Debug("获取报价单信息[DataId={}]", jobDetail.getDataId());
         QuoteObj quoteObj = quoteObjService.loadById(jobDetail.getDataId());
-        JobContextHolder.getContext().setType("报价单");
-        JobContextHolder.getContext().setSerialNo(quoteObj.getName());
-        JobContextHolder.getContext().setOwner(quoteObj.getOwner());
+        JobContext context = JobContextHolder.getContext();
+        context.setType("报价单");
+        context.setSerialNo(quoteObj.getName());
+        context.setOwner(quoteObj.getOwner());
+        context.setMessage("CRM的报价单[" + quoteObj.getName() + "]已成功对接到易飞");
 
         Object_1sCfv__c baojiadanDj = baojiadanDjService.getSuccess(quoteObj.get_id());
         if (baojiadanDj != null && !isDevMode()) {
             String db = baojiadanDj.getField_GI813__c();
             String dh = baojiadanDj.getField_88n41__c();
-            Debug("***报价单已对接过[{}-{}]", db, dh);
+            Debug("报价单已对接过[{}-{}]", db, dh);
             throw new CrmDataException(Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.code,
                     String.format("%s[%s-%s]", Constants.interfaceResponseCode.EXECUTOR_IGNORED_SYNCHRONIZE.msg, db, dh));
         }
@@ -132,16 +127,16 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
         else if ("D6w3kgc3y".equals(quoteObj.getField_f81BW__c()))
             quoteObj.setField_f81BW__c("2");
 
-        Debug("***获取客户信息[AccountId={}]", quoteObj.getAccount_id());
+        Debug("获取客户信息[AccountId={}]", quoteObj.getAccount_id());
         AccountReqEvent accountReqEvent = getAccountReqEvent(quoteObj.getAccount_id());
         AccountObj accountObj = accountReqEvent.getAccountObj();
         if (!StringUtils.isEmpty(accountObj.getField_AlGoN__c()))
             quoteObj.setAccount_bh(accountObj.getField_AlGoN__c());
         quoteObj.setAccount_name(accountObj.getName());
 
-        Debug("***客户编码[={}]", accountObj.getField_AlGoN__c());
+        Debug("客户编码[{}]", accountObj.getField_AlGoN__c());
 
-        Debug("***开始从CRM获取报价单明细数据");
+        Debug("开始从CRM获取报价单明细数据");
         List<QuoteLinesObj> quoteLinesObjs = quoteLinesObjService.listByQuoteId(quoteObj.get_id());
 
         BaojiadanReqEvent baojiadanReqEvent = this.handleTsxq(quoteObj, quoteLinesObjs);

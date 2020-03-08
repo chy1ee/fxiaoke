@@ -5,7 +5,6 @@ com\chylee\fxiaoke\core\model\QrtzTrigger.class
 com\chylee\fxiaoke\quartz\QuartzTriggerManager.class
 com\chylee\fxiaoke\quartz\SpringQuartzJobBean.class
 com\chylee\fxiaoke\core\mapper\SysUserMapper.class
-com\chylee\fxiaoke\quartz\SpringQuartzJob.class
 com\chylee\fxiaoke\core\model\QrtzLog.class
 com\chylee\fxiaoke\core\mapper\QrtzGroupMapper.class
 com\chylee\fxiaoke\core\service\impl\JobTypeServiceImpl.class

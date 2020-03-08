@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface CoptdMapper {
-    @Select("select * from COPTC where TC001=#{db} and TC002=#{dh}")
+    @Select("select * from COPTD where TD001=#{db} and TD002=#{dh}")
     List<Coptd> listByDbAndDh(@Param("db") String db, @Param("dh") String dh);
 }

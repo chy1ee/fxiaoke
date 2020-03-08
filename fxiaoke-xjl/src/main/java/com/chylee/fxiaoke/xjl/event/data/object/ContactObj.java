@@ -107,6 +107,20 @@ public class ContactObj extends DataObject implements Comparable<ContactObj> {
     }
 
     @Override
+    public String toString() {
+        return "ContactObj{" +
+                "name='" + name + '\'' +
+                ", account_id='" + account_id + '\'' +
+                ", tel1='" + tel1 + '\'' +
+                ", tel2='" + tel2 + '\'' +
+                ", tel3='" + tel3 + '\'' +
+                ", mobile1='" + mobile1 + '\'' +
+                ", email='" + email + '\'' +
+                ", company='" + company + '\'' +
+                '}';
+    }
+
+    @Override
     public int compareTo(ContactObj o) {
         // 大于0，正序
         return this.getLast_modified_time().compareTo(o.getLast_modified_time()) < 0 ? 1 : -1;

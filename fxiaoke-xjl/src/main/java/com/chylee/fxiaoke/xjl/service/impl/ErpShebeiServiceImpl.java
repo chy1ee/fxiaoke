@@ -60,6 +60,7 @@ public class ErpShebeiServiceImpl implements ErpShebeiService {
         obj.setField_nA2gP__c(copth.getTG003());
         obj.setDb(copth.getTD017());
         obj.setDh(copth.getTD018());
+        obj.setTG006(copth.getTG006());
 
         return obj;
     }

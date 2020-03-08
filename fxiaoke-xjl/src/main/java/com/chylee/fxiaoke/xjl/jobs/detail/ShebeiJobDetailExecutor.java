@@ -2,6 +2,7 @@ package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
 import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.common.jobs.JobContext;
 import com.chylee.fxiaoke.xjl.event.data.object.DeviceObj;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_47F7O__c;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_snPZx__c;
@@ -49,15 +50,15 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     }
 
     @Override
-    protected void writeResultTo(Event reqEvent, ResponseEvent resp) throws CrmApiException {
+    protected void writeResultTo(Event event, ResponseEvent resp) throws CrmApiException {
+        ShebeiRespEvent respEvent = (ShebeiRespEvent)event;
+        for (DeviceObj obj : respEvent.getDeviceObjs())
+            deviceObjService.save(obj);
     }
 
     @Override
     protected ResponseEvent saveEvent(Event event) throws CrmApiException {
-        ShebeiRespEvent respEvent = (ShebeiRespEvent)event;
-        for (DeviceObj obj : respEvent.getDeviceObjs())
-            deviceObjService.save(obj);
-        return new ResponseEvent();
+        return null;
     }
 
     @Override
@@ -73,15 +74,14 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         if (respEvent.getDeviceObjs() == null)
             throw new ErpDataException("获取销货单数据失败：" + jobDetail.getId());
 
-        return fillRespEvent(respEvent);
+        return fillRespEvent(respEvent, jobDetail.getDataId());
     }
 
-    private Event fillRespEvent(ShebeiRespEvent respEvent) throws CrmApiException, CrmDataException {
+    private Event fillRespEvent(ShebeiRespEvent respEvent, String xhd) throws CrmApiException, CrmDataException {
+        List<String> owner = null;
+        boolean addedToMessage = false;
         for (DeviceObj obj : respEvent.getDeviceObjs()) {
             obj.setDataObjectApiName("DeviceObj");
-
-            //业务员
-            obj.setOwner(personnelObjService.getOwner(null));
 
             //合同
             List<Object_snPZx__c> hts = hetongService.listByDbAndDh(obj.getDb().trim(), obj.getDh().trim());
@@ -110,9 +110,30 @@ public class ShebeiJobDetailExecutor extends AbstractXjlJobDetailExecutor {
             if (StringUtils.hasText(obj.getField_nA2gP__c()))
                 obj.setField_nA2gP__c(DateUtils.toTimestamp(obj.getField_nA2gP__c().trim()));
 
+            if (!addedToMessage) {
+                //业务员
+                owner = personnelObjService.getOwner(obj.getTG006());
+
+                StringBuilder builder = new StringBuilder();
+                builder.append("合同[").append(obj.getDb()).append("-").append(obj.getDh())
+                        .append("]的设备已出库");
+
+                JobContextHolder.getContext().setOwner(owner);
+                JobContextHolder.getContext().setMessage(builder.toString());
+
+                addedToMessage = true;
+            }
+
+            obj.setOwner(owner);
+            obj.setTG006(null);
+
             obj.setDb(null);
             obj.setDh(null);
         }
+
+        JobContext context = JobContextHolder.getContext();
+        context.setSerialNo(xhd);
+        context.setType("销货单");
 
         return respEvent;
     }

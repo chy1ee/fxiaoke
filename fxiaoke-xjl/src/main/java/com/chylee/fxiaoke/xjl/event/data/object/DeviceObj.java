@@ -18,6 +18,8 @@ public class DeviceObj extends DataObject {
     private String field_kwf17__c;      //设备机型
     private String device_name;         //设备名称
 
+    private String TG006;               //业务员
+
     public String getDevice_code() {
         return device_code;
     }
@@ -104,5 +106,13 @@ public class DeviceObj extends DataObject {
 
     public void setField_nA2gP__c(String field_nA2gP__c) {
         this.field_nA2gP__c = field_nA2gP__c;
+    }
+
+    public String getTG006() {
+        return TG006;
+    }
+
+    public void setTG006(String TG006) {
+        this.TG006 = TG006;
     }
 }

@@ -2,6 +2,7 @@ package com.chylee.fxiaoke.xjl.service.impl;
 
 import com.chylee.fxiaoke.common.api.AccessTokenManager;
 import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
+import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.xjl.event.data.object.PersonnelObj;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
@@ -12,6 +13,7 @@ import com.chylee.fxiaoke.xjl.service.FxkPersonnelObjService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -64,21 +66,20 @@ public class FxkPersonnelObjServiceImpl extends AbstractCrmServiceImpl implement
     @Override
     public List<String> getOwner(String ygbh) throws CrmApiException {
         String ownerToReturn;
-        if(ygbh == null) {
+        String ygbhToUse = StringUtils.trim(ygbh);
+        if(ygbhToUse == null) {
             ownerToReturn = getAdminOpenId();
         }
         else {
             try {
-                PersonnelObj personnelObj = loadByYgbh(ygbh);
+                PersonnelObj personnelObj = loadByYgbh(ygbhToUse);
                 return personnelObj.getOwner();
             }
             catch(CrmDataException e) {
-                logger.error("获取员工OpenID失败[{}]", ygbh);
+                logger.error("获取员工OpenID失败[{}]", ygbhToUse);
                 ownerToReturn = getAdminOpenId();
             }
         }
-        List<String> ownerList = new ArrayList<>();
-        ownerList.add(ownerToReturn);
-        return ownerList;
+        return Arrays.asList(ownerToReturn);
     }
 }

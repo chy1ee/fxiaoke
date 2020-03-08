@@ -22,7 +22,6 @@ public class FXKSequenceServiceImpl implements FXKSequenceService {
     private final FxkSequenceMapper sequenceMapper;
     private final ConfigSeqService configSeqService;
 
-    private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
     private Object lockMonitor = new Object();
     private Map<String, DateFormat> dateFormatCacher = new HashMap<>();
 
@@ -34,49 +33,47 @@ public class FXKSequenceServiceImpl implements FXKSequenceService {
     @Override
     public String createXh(String api) throws Exception {
         synchronized (this.lockMonitor) {
-            Date now = new Date();
-            String yf = df.format(now);
-            FxkSequence model = sequenceMapper.loadByApiAndYf(api, yf);
-            FxkSequence modeltoInsert = new FxkSequence();
-            if (model == null) {
-                ConfigSeq seqConfig = configSeqService.getConfig(api);
-                if (seqConfig == null)
-                    throw new ErpDataException("获取派号规则出错：" + api);
+            ConfigSeq seqConfig = configSeqService.getConfig(api);
+            if (seqConfig == null)
+                throw new ErpDataException("获取派号规则配置出错：" + api);
 
+            String yf = getDateFormat(api, seqConfig.getPattern()).format(new Date());
+            FxkSequence model = sequenceMapper.loadByApiAndYf(api, yf);
+            if (model == null) {
+                FxkSequence modeltoInsert = new FxkSequence();
                 modeltoInsert.setApi(api);
                 modeltoInsert.setYf(yf);
                 modeltoInsert.setXh(2);
-                modeltoInsert.setPattern(seqConfig.getPattern());
-                modeltoInsert.setMax(seqConfig.getMax());
-                modeltoInsert.setLen(seqConfig.getLen());
+                modeltoInsert.setPattern("");
+                modeltoInsert.setMax(0);
+                modeltoInsert.setLen(0);
                 sequenceMapper.insert(modeltoInsert);
 
                 if (modeltoInsert.getId() > 0) {
-                    model = sequenceMapper.selectById(modeltoInsert.getId());
-                    if (model == null)
-                        throw new ErpDataException("新增派号信息失败[id=" + modeltoInsert.getId() + "]");
-
-                    if (dateFormatCacher.containsKey(api))
-                        dateFormatCacher.remove(api);
+                    model = new FxkSequence();
+                    model.setXh(1);
                 }
             }
             else {
-                if (model.getXh() >= model.getMax())
+                if (model.getXh() >= seqConfig.getMax())
                     throw new Exception("API序号超过最大值[" + api + "]");
 
-                modeltoInsert.setId(model.getId());
-                modeltoInsert.setXh(model.getXh() + 1);
-                sequenceMapper.updateById(modeltoInsert);
-
+                FxkSequence modeltoUpdate = new FxkSequence();
+                modeltoUpdate.setId(model.getId());
+                modeltoUpdate.setXh(model.getXh() + 1);
+                sequenceMapper.updateById(modeltoUpdate);
             }
 
-            DateFormat dateFormat = dateFormatCacher.get(api);
-            if (dateFormat == null) {
-                dateFormat = new SimpleDateFormat(model.getPattern());
-                dateFormatCacher.put(api, dateFormat);
-            }
-
-            return String.format("%s%0"+model.getLen()+"d", dateFormatCacher.get(api).format(now), model.getXh());
+            return String.format("%s%0"+seqConfig.getLen()+"d", yf, model.getXh());
         }
+    }
+
+    private DateFormat getDateFormat(String api, String pattern) {
+        DateFormat dateFormat = dateFormatCacher.get(api);
+        if (dateFormat == null) {
+            dateFormat = new SimpleDateFormat(pattern);
+            dateFormatCacher.put(api, dateFormat);
+        }
+        return dateFormat;
     }
 }

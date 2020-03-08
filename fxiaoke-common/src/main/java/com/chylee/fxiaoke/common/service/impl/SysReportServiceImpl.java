@@ -23,9 +23,6 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
     private final ConfigAdminService configuration;
     private final FxkReportMapper reportMapper;
 
-    @Value("${spring.profiles.active}")
-    protected String profiles;
-
     public SysReportServiceImpl(AccessTokenManager accessTokenManager, ConfigAdminService configuration,
                                 FxkReportMapper reportMapper) {
         super(accessTokenManager);
@@ -35,14 +32,16 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
 
 
     @Override
-    public MsgRespEvent send(String content) {
-        return send(configuration.getAdminOpenIds(), content);
+    public MsgRespEvent sendToAdmin(String content) {
+        return sendTextMsg(configuration.getAdminOpenIds(), content);
     }
 
+    /*
     @Override
     public MsgRespEvent send(List<String> openIds, String content) {
         return configuration.getStatus() == 1 ? this.sendTextMsg(openIds, content) : new MsgRespEvent();
     }
+     */
 
     private MsgRespEvent sendTextMsg(List<String> toUsers, String content) {
         if (content != null && content.length() > 255)
@@ -55,17 +54,21 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
 
         saveReport(null, null, null, reqEvent.getToUser());
 
-        return "dev".equals(profiles) ?  new MsgRespEvent() :
-                doPost("/cgi/message/send", reqEvent, MsgRespEvent.class);
+        if (isDevMode()) {
+            Debug("文本信息通知[{}][{}]", toUsers, content);
+            return new MsgRespEvent();
+        }
+        else
+            return doPost("/cgi/message/send", reqEvent, MsgRespEvent.class);
     }
 
     @Override
-    public MsgRespEvent sendExecutorReport(List<String> toUser, String type, String serial, String error) {
+    public MsgRespEvent sendExecutorReport(List<String> toUser, String type, String serial, boolean success, String message) {
         if (configuration.getStatus() != 1)
             return new MsgRespEvent();
 
-        if (error != null && error.length() > 255)
-            error = StringUtils.gbkLeft(error, 255);
+        if (message != null && message.length() > 255)
+            message = StringUtils.gbkLeft(message, 255);
 
         MsgReqEvent reqEvent = new MsgReqEvent();
         Composite composite = new Composite();
@@ -73,28 +76,27 @@ public class SysReportServiceImpl extends AbstractFxkServiceImpl implements SysR
         composite.setFirst(new Content(df.format(new Date())));
         composite.addForm(new Form("类型", type));
         composite.addForm(new Form("单号", serial));
-        composite.addForm(new Form("结果", error == null ? "成功" : "失败"));
-        if (error != null)
-            composite.setRemark(new Content(error));
+        composite.addForm(new Form("结果", success ? "成功" : "失败"));
+        if (message != null)
+            composite.setRemark(new Content(message));
         composite.setLink(new Link("没有详细信息", "#"));
 
         if (toUser == null || toUser.isEmpty())
             reqEvent.setToUser(configuration.getAdminOpenIds());
-        else if (error == null)
-            reqEvent.setToUser(toUser);
-        else {
+        else if (!success || configuration.getStatus() == 1) {
             reqEvent.setToUser(Stream.of(toUser, configuration.getAdminOpenIds())
                     .flatMap(Collection::stream)
                     .distinct()
                     .collect(Collectors.toList()));
         }
+        else {
+            reqEvent.setToUser(toUser);
+        }
 
         reqEvent.setMsgType("composite");
         reqEvent.setComposite(composite);
 
-
-
-        saveReport(type, serial, error, reqEvent.getToUser());
+        saveReport(type, serial, message, reqEvent.getToUser());
 
         return "dev".equals(profiles) ?  new MsgRespEvent() :
                 doPost("/cgi/message/send", reqEvent, MsgRespEvent.class);

@@ -1,8 +1,8 @@
 package com.chylee.fxiaoke.xjl.model;
 
 public class Coptg extends Xjl {
-    private String TG001;
-    private String TG002;
+    private String TG001;   //单别
+    private String TG002;   //单号
 
     public String getTG001() {
         return TG001;
@@ -19,4 +19,5 @@ public class Coptg extends Xjl {
     public void setTG002(String TG002) {
         this.TG002 = TG002;
     }
+
 }

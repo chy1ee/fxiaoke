@@ -1,6 +1,9 @@
 package com.chylee.fxiaoke.xjl.model;
 
+import com.chylee.fxiaoke.common.util.StringUtils;
+
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * 客户
@@ -160,7 +163,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA002(String MA002) {
-        this.MA002 = MA002;
+        this.MA002 = StringUtils.trim(MA002);
     }
 
     public String getMA003() {
@@ -168,7 +171,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA003(String MA003) {
-        this.MA003 = MA003;
+        this.MA003 = StringUtils.trim(MA003);
     }
 
     public String getMA004() {
@@ -184,7 +187,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA005(String MA005) {
-        this.MA005 = MA005;
+        this.MA005 = StringUtils.trim(MA005);
     }
 
     public String getMA006() {
@@ -192,7 +195,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA006(String MA006) {
-        this.MA006 = MA006;
+        this.MA006 = StringUtils.trim(MA006);
     }
 
     public String getMA007() {
@@ -200,7 +203,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA007(String MA007) {
-        this.MA007 = MA007;
+        this.MA007 = StringUtils.trim(MA007);
     }
 
     public String getMA008() {
@@ -208,7 +211,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA008(String MA008) {
-        this.MA008 = MA008;
+        this.MA008 = StringUtils.trim(MA008);
     }
 
     public String getMA009() {
@@ -272,7 +275,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA016(String MA016) {
-        this.MA016 = MA016;
+        this.MA016 = StringUtils.trim(MA016);
     }
 
     public String getMA017() {
@@ -328,7 +331,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA023(String MA023) {
-        this.MA023 = MA023;
+        this.MA023 = StringUtils.trim(MA023);
     }
 
     public String getMA024() {
@@ -360,7 +363,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA027(String MA027) {
-        this.MA027 = MA027;
+        this.MA027 = StringUtils.trim(MA027);
     }
 
     public String getMA028() {
@@ -824,7 +827,7 @@ public class Copma extends Xjl {
     }
 
     public void setMA085(String MA085) {
-        this.MA085 = MA085;
+        this.MA085 = StringUtils.trim(MA016);
     }
 
     public String getMA086() {
@@ -1265,5 +1268,43 @@ public class Copma extends Xjl {
 
     public void setUDF62(BigDecimal UDF62) {
         this.UDF62 = UDF62;
+    }
+
+    @Override
+    public String toString() {
+        return "Copma{" +
+                "MA002='" + MA002 + '\'' +
+                ", MA003='" + MA003 + '\'' +
+                ", MA005='" + MA005 + '\'' +
+                ", MA006='" + MA006 + '\'' +
+                ", MA007='" + MA007 + '\'' +
+                ", MA008='" + MA008 + '\'' +
+                ", MA016='" + MA016 + '\'' +
+                ", MA023='" + MA023 + '\'' +
+                ", MA027='" + MA027 + '\'' +
+                ", MA085='" + MA085 + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Copma copma = (Copma) o;
+        return Objects.equals(MA002, copma.MA002) &&
+                Objects.equals(MA003, copma.MA003) &&
+                Objects.equals(MA005, copma.MA005) &&
+                Objects.equals(MA006, copma.MA006) &&
+                Objects.equals(MA007, copma.MA007) &&
+                Objects.equals(MA008, copma.MA008) &&
+                Objects.equals(MA016, copma.MA016) &&
+                Objects.equals(MA023, copma.MA023) &&
+                Objects.equals(MA027, copma.MA027) &&
+                Objects.equals(MA085, copma.MA085);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(MA002,MA003,MA005,MA006,MA007,MA008,MA016,MA023,MA027,MA085);
     }
 }

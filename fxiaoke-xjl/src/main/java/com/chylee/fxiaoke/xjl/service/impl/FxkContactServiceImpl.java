@@ -32,7 +32,7 @@ public class FxkContactServiceImpl extends AbstractCrmServiceImpl implements Fxk
 
     @Override
     public List<ContactObj> listByAccounrIdAndName(String accountId, String name) throws CrmApiException {
-        Debug("***获取联系人信息[{}][{}]", accountId, name);
+        Debug("获取联系人信息[{}][{}]", accountId, name);
         List<QueryInfoFilter> queryInfoFilters = new ArrayList<>();
         queryInfoFilters.add(new QueryInfoFilter("account_id", accountId));
         if (name != null)

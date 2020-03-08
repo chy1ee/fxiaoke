@@ -2,6 +2,7 @@ package com.chylee.fxiaoke.xjl.jobs.detail;
 
 import com.chylee.fxiaoke.common.event.Event;
 import com.chylee.fxiaoke.common.event.ResponseEvent;
+import com.chylee.fxiaoke.common.jobs.JobContext;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_79pYP__c;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_h18X2__c;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_okom1__c;
@@ -87,9 +88,12 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     @Override
     protected Event createEvent(JobDetail jobDetail) throws CrmApiException, CrmDataException {
         Object_okom1__c pz = baoxiaoService.loadById(jobDetail.getDataId());
-        JobContextHolder.getContext().setType("报销单");
-        JobContextHolder.getContext().setSerialNo(pz.getName());
-        JobContextHolder.getContext().setOwner(pz.getOwner());
+
+        JobContext context = JobContextHolder.getContext();
+        context.setType("报销单");
+        context.setSerialNo(pz.getName());
+        context.setOwner(pz.getOwner());
+        context.setMessage("CRM的合同[" + pz.getName() + "]已成功对接到易飞");
 
         Object_h18X2__c baoxiaoDj = baoxiaoDjService.getSuccess(pz.get_id());
         if (baoxiaoDj != null && !isDevMode()) {

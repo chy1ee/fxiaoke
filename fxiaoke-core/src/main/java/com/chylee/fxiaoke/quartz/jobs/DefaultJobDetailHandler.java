@@ -1,41 +1,25 @@
 package com.chylee.fxiaoke.quartz.jobs;
 
-import com.chylee.fxiaoke.common.service.JobLogService;
-import com.chylee.fxiaoke.common.model.JobDetail;
-import com.chylee.fxiaoke.common.util.StringUtils;
 import com.chylee.fxiaoke.common.jobs.quartz.SpringQuartzJob;
-import com.chylee.fxiaoke.common.jobs.detail.JobDetailExecutor;
+import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
-import com.chylee.fxiaoke.common.service.SysReportService;
+import com.chylee.fxiaoke.common.service.JobLogService;
 import com.chylee.fxiaoke.quartz.jobs.support.Result;
 import com.chylee.fxiaoke.quartz.jobs.support.ResultContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 消费任务队列
+ * 定时任务方式消费任务队列
  */
-@Component("jobDetail")
-public class DefaultJobDetailHandler implements SpringQuartzJob, ApplicationContextAware {
-    private Logger logger = LoggerFactory.getLogger(DefaultJobDetailHandler.class);
+public class DefaultJobDetailHandler extends AbstractJobDetailHandler implements SpringQuartzJob {
+    private final JobLogService jobLogService;
+    private final JobDetailService jobDetailService;
 
-    private Collection<JobDetailExecutor> executors = null;
-
-    private JobLogService jobLogService;
-    private JobDetailService jobDetailService;
-    private SysReportService reportService;
-
-    public DefaultJobDetailHandler(JobDetailService jobDetailService, SysReportService reportService,
-                                   JobLogService jobLogService) {
+    public DefaultJobDetailHandler(JobDetailService jobDetailService, JobLogService jobLogService) {
+        super(jobDetailService);
         this.jobDetailService = jobDetailService;
-        this.reportService = reportService;
         this.jobLogService = jobLogService;
     }
 
@@ -61,32 +45,5 @@ public class DefaultJobDetailHandler implements SpringQuartzJob, ApplicationCont
         Collection<Result> results = context.getContext();
         for (Result result : results)
             jobLogService.updateResultById(result.getLogId(), result.getSuccess(), result.getFail());
-    }
-
-
-    private boolean handleJobDetail(JobDetail jobDetail)  {
-        boolean result = false;
-        for (JobDetailExecutor executor : executors) {
-            if (executor.isSupported(jobDetail.getTypeId())) {
-                if (!result)
-                    result = true;
-
-                if (!executor.execute(jobDetail))
-                    return false;
-            }
-        }
-
-        if (!result) {
-            jobDetailService.upateStatusById(jobDetail.getId(), -1,
-                    StringUtils.gbkLeft("没有符合条件的执行器", 200));
-        }
-
-        return result;
-    }
-
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        executors = applicationContext.getBeansOfType(JobDetailExecutor.class).values();
     }
 }

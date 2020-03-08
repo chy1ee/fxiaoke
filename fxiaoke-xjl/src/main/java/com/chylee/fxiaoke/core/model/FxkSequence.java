@@ -1,5 +1,7 @@
 package com.chylee.fxiaoke.core.model;
 
+import java.util.Objects;
+
 public class FxkSequence {
     private Integer id;
     private String api;
@@ -73,4 +75,5 @@ public class FxkSequence {
     public void setLen(int len) {
         this.len = len;
     }
+
 }

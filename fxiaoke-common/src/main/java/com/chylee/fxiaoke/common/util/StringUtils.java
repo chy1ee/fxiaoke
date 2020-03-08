@@ -18,6 +18,10 @@ public class StringUtils {
         return s;
     }
 
+    public static String trim(String s) {
+        return trim(s, false);
+    }
+
     public static String trim(String s, boolean blankable) {
         if (s != null) {
             s = s.trim();

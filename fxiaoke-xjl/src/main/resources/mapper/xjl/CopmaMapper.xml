@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chylee.fxiaoke.xjl.mapper.CopmaMapper">
+    <update id="updateByKhbh" parameterType="com.chylee.fxiaoke.xjl.model.Copma">
+        update COPMA
+        <set>
+            <choose><when test="MA002 == 'NULL'">MA002 = null,</when><when test="MA002 != null">MA002 = #{MA002},</when></choose>
+            <choose><when test="MA005 == 'NULL'">MA005 = null,</when><when test="MA005 != null">MA005 = #{MA005},</when></choose>
+            <choose><when test="MA006 == 'NULL'">MA006 = null,</when><when test="MA006 != null">MA006 = #{MA006},</when></choose>
+            <choose><when test="MA007 == 'NULL'">MA007 = null,</when><when test="MA007 != null">MA007 = #{MA007},</when></choose>
+            <choose><when test="MA008 == 'NULL'">MA008 = null,</when><when test="MA008 != null">MA008 = #{MA008},</when></choose>
+            <choose><when test="MA016 == 'NULL'">MA016 = null,</when><when test="MA016 != null">MA016 = #{MA008},</when></choose>
+            <choose><when test="MA023 == 'NULL'">MA023 = null,</when><when test="MA023 != null">MA023 = #{MA023},</when></choose>
+            <choose><when test="MA027 == 'NULL'">MA027 = null,</when><when test="MA027 != null">MA027 = #{MA027},</when></choose>
+            <choose><when test="MA085 == 'NULL'">MA085 = null,</when><when test="MA085 != null">MA085 = #{MA085},</when></choose>
+        </set>
+        where MA001 = #{MA001}
+    </update>
     <insert id="insert" parameterType="com.chylee.fxiaoke.xjl.model.Copma">
         insert into COPMA
         <trim prefix="(" suffix=")" suffixOverrides=",">

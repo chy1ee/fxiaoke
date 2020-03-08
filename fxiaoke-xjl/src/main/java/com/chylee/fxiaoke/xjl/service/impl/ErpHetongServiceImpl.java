@@ -12,6 +12,7 @@ import com.chylee.fxiaoke.xjl.mapper.CopabMapper;
 import com.chylee.fxiaoke.xjl.mapper.CopmaMapper;
 import com.chylee.fxiaoke.xjl.model.Copaa;
 import com.chylee.fxiaoke.xjl.model.Copab;
+import com.chylee.fxiaoke.xjl.model.Copma;
 import com.chylee.fxiaoke.xjl.service.ErpAccountService;
 import com.chylee.fxiaoke.xjl.service.ErpHetongService;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class ErpHetongServiceImpl implements ErpHetongService {
     public AccountRespEvent save(HetongReqEvent reqEvent) {
         AccountObj accountObj = reqEvent.getAccountObj();
         if (accountObj == null)
-            return new AccountRespEvent("客户不允许为空");
+            return new AccountRespEvent(-1, "客户不允许为空");
 
         // 写客户信息
         AccountRespEvent accountRespEvent = accountService.save(reqEvent);
@@ -55,11 +56,12 @@ public class ErpHetongServiceImpl implements ErpHetongService {
         Object_snPZx__c ht = reqEvent.getHt();
         Object_47F7O__c htmx = reqEvent.getHtmx();
 
-        String khbhToReturn = accountRespEvent.getKhbh();
+        Copma copma = accountRespEvent.getCopma();
+        String khbh = copma.getMA001();
         if (StringUtils.isEmpty(ht.getAA010()))
-            ht.setAA010(khbhToReturn);
+            ht.setAA010(khbh);
 
-        BigDecimal sl = copmaMapper.loadShuilv(ht.getAA010());
+        BigDecimal sl = copma.getMA101();
         if (sl == null)
             return new AccountRespEvent(-1, "获取税率失败 - " + ht.getAA010());
 
@@ -79,17 +81,11 @@ public class ErpHetongServiceImpl implements ErpHetongService {
             return new AccountRespEvent(-1, "保存合同主题失败 - " + e.getMessage());
         }
 
-        AccountRespEvent respEvent = new AccountRespEvent();
-        if (khbhToReturn != null)
-            respEvent.setKhbh(khbhToReturn);
-
-        return respEvent;
+        return accountRespEvent;
     }
 
     private Copab toCopab(Object_47F7O__c htmx, Object_snPZx__c ht, BigDecimal sl) {
         Copab copab = new Copab();
-
-        copab.setUSR_GROUP("XJL02");
 
         copab.setAB001(htmx.getAB001());	//合同单别
         copab.setAB002(htmx.getAB002());	//合同单号
@@ -161,8 +157,6 @@ public class ErpHetongServiceImpl implements ErpHetongService {
 
     private Copaa toCopaa(Object_47F7O__c htmx, Object_snPZx__c ht, BigDecimal sl) {
         Copaa copaa= new Copaa();
-
-        copaa.setUSR_GROUP("XJL02");
 
         copaa.setAA001(ht.getField_d91gZ__c());	// 合同单别
         copaa.setAA002(ht.getField_WCjgL__c());	// 合同单号
