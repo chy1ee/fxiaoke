@@ -1,6 +1,7 @@
 package com.chylee.fxiaoke.quartz.jobs;
 
 import com.chylee.fxiaoke.common.jobs.detail.JobDetailExecutor;
+import com.chylee.fxiaoke.common.jobs.log.JobLogExecutor;
 import com.chylee.fxiaoke.common.model.JobDetail;
 import com.chylee.fxiaoke.common.service.JobDetailService;
 import com.chylee.fxiaoke.common.util.StringUtils;
@@ -24,6 +25,13 @@ public class AbstractJobDetailHandler implements ApplicationContextAware  {
     }
 
     protected boolean handleJobDetail(JobDetail jobDetail)  {
+        if (logger.isDebugEnabled())
+            logger.debug("正在处理任务：" + jobDetail);
+
+        if (jobDetail == null) {
+            return false;
+        }
+
         boolean result = false;
         for (JobDetailExecutor executor : executors) {
             if (executor.isSupported(jobDetail.getTypeId())) {
@@ -46,5 +54,12 @@ public class AbstractJobDetailHandler implements ApplicationContextAware  {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         executors = applicationContext.getBeansOfType(JobDetailExecutor.class).values();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("scaning executor:");
+            int i = 1;
+            for (JobDetailExecutor executor : executors)
+                logger.debug("***{}.{} ", i++,  executor.getClass().getName());
+        }
     }
 }

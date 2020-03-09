@@ -5,7 +5,6 @@ import com.chylee.fxiaoke.common.event.fxiaoke.crm.data.QueryInfoFilter;
 import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.service.impl.AbstractCrmServiceImpl;
 import com.chylee.fxiaoke.xjl.event.data.object.Object_h18X2__c;
-import com.chylee.fxiaoke.xjl.event.data.object.Object_qlu3s__c;
 import com.chylee.fxiaoke.xjl.service.FxkBaoxiaoDjService;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ public class FxkBaoxiaoDjServiceImpl extends AbstractCrmServiceImpl implements F
         Object_h18X2__c object = new Object_h18X2__c();
         object.setDataObjectApiName("object_h18X2__c");
         object.setOwner(Arrays.asList(getAdminOpenId()));
-        object.setField_wqn9g__c(baoxiao);
+        object.setField_IM32I__c(baoxiao);
         object.setField_1r0bN__c(db);
         object.setField_g6j6m__c(dh);
         object.setField_8amY2__c(error);

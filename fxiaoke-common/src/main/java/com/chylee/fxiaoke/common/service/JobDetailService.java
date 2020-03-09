@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface JobDetailService {
     int PAGE_SIZE = 50;
+    void initJobDetailCachar();
     void reset(int id) throws ServiceException;
     void insertBatch(List<JobDetail> jobDetailList);
     void upateStatusById(int id, int status, String error);

@@ -46,7 +46,7 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     @Override
     protected void writeErrorTo(String dataId, String error) {
         try {
-            baoxiaoDjService.save(dataId, null, null, error, false);
+            baoxiaoService.update(dataId, null, error);
         } catch (Exception e) {
             logger.error(error, e);
         }
@@ -57,8 +57,18 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
         PingzhengReqEvent reqEvent = (PingzhengReqEvent)event;
 
         Object_okom1__c pz = reqEvent.getPz();
-        String dh = pz.getField_EHyt1__c();
-        String db = pz.getField_8GijD__c();
+        String db = pz.getField_EHyt1__c();
+        String dh = pz.getField_8GijD__c();
+
+        try {
+            baoxiaoService.update(pz.get_id(), db, dh);
+        } catch (Exception e) {
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code,
+                    String.format("%s[合同][%s-%s][%s]", Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, pz.get_id())
+            );
+        }
+
+        /*
         try {
             baoxiaoDjService.save(pz.get_id(), db, dh, null, true);
         } catch (Exception e) {
@@ -67,6 +77,7 @@ public class PingzhengJobDetailExecutor extends AbstractXjlJobDetailExecutor {
             logger.error(error, e);
             throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
         }
+        */
     }
 
     @Override

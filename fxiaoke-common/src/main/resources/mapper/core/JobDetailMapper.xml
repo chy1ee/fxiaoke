@@ -2,16 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chylee.fxiaoke.common.mapper.JobDetailMapper">
-    <select id="listByStatus0" resultType="com.chylee.fxiaoke.common.model.JobDetail">
+    <sql id="selectJobDetail">
         select q.id, q.log_id,q.data_id,q.status,q.error,t.type_id
         from job_detail q,job_log t
-        where t.id=q.log_id and q.status = 0 limit #{pageSize}
+        where t.id=q.log_id
+    </sql>
+
+    <select id="selectById" resultType="com.chylee.fxiaoke.common.model.JobDetail">
+        <include refid="selectJobDetail" /> and q.id = #{id}
+    </select>
+
+    <select id="listByStatus0" resultType="com.chylee.fxiaoke.common.model.JobDetail">
+        <include refid="selectJobDetail" /> and q.status = 0<if test="pageSize > 0"> limit #{pageSize}</if>
     </select>
 
     <select id="listAll" resultType="com.chylee.fxiaoke.common.model.JobDetail">
-        select q.id, q.log_id,q.data_id,q.status,q.error,t.type_id
-        from job_detail q,job_log t
-        where t.id=q.log_id and t.type_id=#{typeId}<if test="id>0"> and a.id>#{id}</if>
+        <include refid="selectJobDetail" /> and t.type_id=#{typeId}<if test="id>0"> and a.id>#{id}</if>
     </select>
 
     <select id="count" resultType="Integer">
@@ -34,12 +40,9 @@
         limit #{offset},#{pageSize}
     </select>
 
-    <insert id="insertBatch">
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="com.chylee.fxiaoke.common.model.JobDetail">
         INSERT INTO job_detail (log_id, data_id)
-        VALUES
-        <foreach collection ="queueList" item="queue" separator =",">
-            (#{queue.logId}, #{queue.dataId})
-        </foreach >
+        VALUES (#{logId}, #{dataId})
     </insert>
 
 </mapper>

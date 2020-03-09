@@ -5,6 +5,7 @@ com\chylee\fxiaoke\core\model\QrtzTrigger.class
 com\chylee\fxiaoke\quartz\QuartzTriggerManager.class
 com\chylee\fxiaoke\quartz\SpringQuartzJobBean.class
 com\chylee\fxiaoke\core\mapper\SysUserMapper.class
+com\chylee\fxiaoke\quartz\jobs\AbstractJobDetailHandler.class
 com\chylee\fxiaoke\core\model\QrtzLog.class
 com\chylee\fxiaoke\core\mapper\QrtzGroupMapper.class
 com\chylee\fxiaoke\core\service\impl\JobTypeServiceImpl.class
@@ -12,6 +13,7 @@ com\chylee\fxiaoke\quartz\jobs\DetaultJobLogHandler.class
 com\chylee\fxiaoke\core\event\fxiaoke\dept\DeptListReqEvent.class
 com\chylee\fxiaoke\core\model\QrtzJob.class
 com\chylee\fxiaoke\core\model\JobType.class
+com\chylee\fxiaoke\quartz\jobs\DefaultJobDetailConsumer.class
 com\chylee\fxiaoke\quartz\jobs\support\ResultContext.class
 com\chylee\fxiaoke\core\event\UserInfoRespEvent.class
 com\chylee\fxiaoke\core\mapper\QrtzJobMapper.class
@@ -28,6 +30,7 @@ com\chylee\fxiaoke\core\service\impl\DashBoardServiceImpl.class
 com\chylee\fxiaoke\quartz\jobs\support\Result.class
 com\chylee\fxiaoke\core\service\QrtzJobService.class
 com\chylee\fxiaoke\core\service\impl\QrtzTriggerServiceImpl.class
+com\chylee\fxiaoke\quartz\jobs\DefaultJobDetailConsumer$JobDetailRunner.class
 com\chylee\fxiaoke\core\service\SysUserService.class
 com\chylee\fxiaoke\core\mapper\QrtzLogMapper.class
 com\chylee\fxiaoke\core\service\QrtzLogService.class

@@ -15,6 +15,7 @@ import com.chylee.fxiaoke.xjl.service.*;
 import com.chylee.fxiaoke.xjl.service.impl.FxkProductObjServiceImpl;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,13 @@ public class DingdanJobDetailExecutor extends AbstractXjlJobDetailExecutor {
     }
 
     @Override
-    protected ResponseEvent saveEvent(Event reqEvent) throws CrmApiException {
+    protected ResponseEvent saveEvent(Event event) throws CrmApiException, CrmDataException {
+        DingdanRespEvent respEvent = (DingdanRespEvent)event;
+        String db = respEvent.getSalesOrderObj().getField_4m6gr__c();
+        String dh = respEvent.getSalesOrderObj().getField_4xWXT__c();
+        List<SalesOrderObj> salesOrderObjs = salesOrderObjService.listByDbAndDh(db, dh);
+        if (salesOrderObjs != null && !salesOrderObjs.isEmpty())
+            throw new CrmDataException(MessageFormat.format("销售订单已存在{0}-{1}", db, dh));
         return null;
     }
 

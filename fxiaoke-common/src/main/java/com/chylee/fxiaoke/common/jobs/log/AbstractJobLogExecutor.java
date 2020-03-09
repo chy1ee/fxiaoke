@@ -34,7 +34,7 @@ public abstract class AbstractJobLogExecutor implements JobLogExecutor {
         JobLog jobLog = jobLogService.current(qrtzId, typeId, now(qrtzId, typeId, apiName));
 
         int logId = jobLog.getId();
-        List<JobDetail> jobDetails = this.listJobs(logId, apiName,
+        List<JobDetail> jobDetails = this.listJobs(typeId, logId, apiName,
                 jobLog.getStartTime(), jobLog.getEndTime());
         if (jobDetails == null) {
             if (logger.isDebugEnabled())
@@ -54,6 +54,6 @@ public abstract class AbstractJobLogExecutor implements JobLogExecutor {
         return new Date();
     }
 
-    protected abstract List<JobDetail> listJobs(Integer logId, String apiName, Date startTime, Date endTime)
+    protected abstract List<JobDetail> listJobs(int typeId, int logId, String apiName, Date startTime, Date endTime)
             throws AccessTokenException, CrmDataException, ErpApiException, ErpDataException;
 }

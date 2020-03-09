@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   cache:
     ehcache:
       config: classpath:ehcache/ehcache.xml

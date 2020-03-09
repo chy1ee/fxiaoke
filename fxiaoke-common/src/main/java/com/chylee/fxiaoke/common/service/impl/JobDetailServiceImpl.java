@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +32,15 @@ public class JobDetailServiceImpl implements JobDetailService {
         this.jobLogMapper = jobLogMapper;
         this.jobDetailQueue = jobDetailQueue;
         this.reportService = reportService;
+    }
+
+    @Override
+    public void initJobDetailCachar() {
+        List<JobDetail> jobDetails = jobDetailMapper.listByStatus0(0);
+        if (jobDetails == null || jobDetails.isEmpty())
+            return;
+
+        insertBatch(jobDetails, false);
     }
 
     @Override
@@ -56,16 +64,22 @@ public class JobDetailServiceImpl implements JobDetailService {
 
     @Override
     public void insertBatch(List<JobDetail> jobDetails) {
+        insertBatch(jobDetails, true);
+    }
+
+    public void insertBatch(List<JobDetail> jobDetails, boolean inserToDb) {
         if (jobDetails == null || jobDetails.isEmpty())
             return;
 
-        int i = 0;
-        try {
-            jobDetailMapper.insertBatch(jobDetails);
-            for (int j=jobDetails.size();i<j;i++)
-                jobDetailQueue.put(jobDetails.get(i));
-        } catch (Exception e) {
-            handleQueuePutError(jobDetails, i, e);
+        for (JobDetail jobDetail : jobDetails) {
+            try {
+                if (inserToDb)
+                    jobDetailMapper.insert(jobDetail);
+                jobDetailQueue.put(jobDetail);
+            } catch (Exception e) {
+                logger.error("数据入任务队列时发生错误\n\t{}", jobDetail, e);
+                reportService.sendToAdmin("数据入任务队列时发生错误，请及时查看日志并处理，以免数据丢失");
+            }
         }
     }
 
@@ -102,17 +116,6 @@ public class JobDetailServiceImpl implements JobDetailService {
         }
 
         return jobDetails;
-    }
-
-    private void handleQueuePutError(List<JobDetail> jobDetails, int index, Throwable throwable) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("数据入任务队列时发生错误，当前序号[").append(index).append("]，数据列表：\n");
-        if (jobDetails != null) {
-            for (int k = 0, l = jobDetails.size(); k < l; k++)
-                msg.append(k).append("、").append(jobDetails.get(k)).append("\n");
-        }
-        logger.error(msg.toString(), throwable);
-        reportService.sendToAdmin("数据入任务队列时发生错误，请及时查看日志并处理，以免数据丢失");
     }
 
     @Override

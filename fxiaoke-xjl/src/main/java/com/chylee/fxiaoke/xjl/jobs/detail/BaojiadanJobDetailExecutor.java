@@ -50,7 +50,7 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
     @Override
     protected void writeErrorTo(String dataId, String error) {
         try {
-            baojiadanDjService.save(dataId, null, null, error, false);
+            quoteObjService.update(dataId, null, error);
         } catch (CrmApiException e) {
             logger.error(error, e);
         }
@@ -72,6 +72,15 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
         QuoteObj quoteObj = reqEvent.getQuoteObj();
         String db = quoteObj.getField_kq20e__c();
         String dh = quoteObj.getField_SS32r__c();
+
+        try {
+            quoteObjService.update(quoteObj.get_id(), db, dh);
+        } catch (Exception e) {
+            throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code,
+                    String.format("%s[合同][%s-%s][%s]", Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, quoteObj.get_id())
+            );
+        }
+        /*
         try {
             baojiadanDjService.save(quoteObj.get_id(), db, dh, null, true);
         } catch (CrmApiException e) {
@@ -80,6 +89,7 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
             logger.error(error, e);
             throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code, error);
         }
+        */
     }
 
     @Override
@@ -148,10 +158,12 @@ public class BaojiadanJobDetailExecutor extends AbstractAccountJobDetailExecutor
     private BaojiadanReqEvent handleTsxq(QuoteObj quoteObj, List<QuoteLinesObj> quoteLinesObjs) throws CrmDataException {
         StringBuilder tsxq = new StringBuilder();
 
-        if (StringUtils.isEmpty(quoteObj.getField_j2oq2__c())) {
+        if (!StringUtils.isEmpty(quoteObj.getField_j2oq2__c())) {
             String _xq = quoteObj.getField_j2oq2__c();
+            Debug("特殊需求 - {}", _xq);
             tsxq.append(_xq);
-            if (!"；".equals(_xq.substring(_xq.length() -1)))
+            int l = _xq.length();
+            if (!"；".equals(_xq.substring(l-1)))
                 tsxq.append("；");
         }
 

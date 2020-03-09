@@ -5,19 +5,19 @@ import com.chylee.fxiaoke.common.event.fxiaoke.data.object.DataObject;
 import java.util.List;
 
 public class Object_h18X2__c extends DataObject {
-    private String field_wqn9g__c;  //报销单
+    private String field_IM32I__c;  //报销单
     private String field_1r0bN__c;  //单别
     private String field_g6j6m__c;  //单号
     private String field_8amY2__c;  //错误信息
     private boolean field_w9nvZ__c;  //成功
     private List<String> owner;
 
-    public String getField_wqn9g__c() {
-        return field_wqn9g__c;
+    public String getField_IM32I__c() {
+        return field_IM32I__c;
     }
 
-    public void setField_wqn9g__c(String field_wqn9g__c) {
-        this.field_wqn9g__c = field_wqn9g__c;
+    public void setField_IM32I__c(String field_IM32I__c) {
+        this.field_IM32I__c = field_IM32I__c;
     }
 
     public String getField_1r0bN__c() {

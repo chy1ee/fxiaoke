@@ -69,7 +69,7 @@ export const constantRoutes = [
       },
       {
         path: 'object',
-        name: 'object',
+        name: 'object2',
         component: () => import('@/views/fxiaoke/object'),
         meta: { title: '对象列表', icon: 'skill' }
       },

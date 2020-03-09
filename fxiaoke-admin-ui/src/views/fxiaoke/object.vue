@@ -24,7 +24,7 @@
   import { list } from '@/api/fxiaoke/object'
 
   export default {
-    name: "object",
+    name: "object2",
     data() {
       return {
         objectList: []
@@ -38,6 +38,7 @@
         const resp = await list();
         if(resp.success) {
           this.objectList = resp.data.objects;
+          console.log(resp)
         }
       }
     }

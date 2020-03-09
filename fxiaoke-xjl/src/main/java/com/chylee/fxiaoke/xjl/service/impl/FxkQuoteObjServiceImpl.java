@@ -19,8 +19,13 @@ public class FxkQuoteObjServiceImpl extends AbstractCrmServiceImpl implements Fx
     }
 
     @Override
-    public void update(QuoteObj quoteObj) throws CrmApiException {
-        updateDataObj(quoteObj);
+    public void update(String dataId, String db, String dh) throws CrmApiException {
+        QuoteObj quoteObjToUpdate = new QuoteObj();
+        quoteObjToUpdate.setDataObjectApiName("QuoteObj");
+        quoteObjToUpdate.set_id(dataId);
+        quoteObjToUpdate.setField_kq20e__c(db);
+        quoteObjToUpdate.setField_SS32r__c(dh);
+        updateDataObj(quoteObjToUpdate);
     }
 
     @Override

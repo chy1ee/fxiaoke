@@ -37,7 +37,7 @@ public class FXKJobLogExecutor extends AbstractJobLogExecutor {
     }
 
     @Override
-    protected List<JobDetail> listJobs(Integer logId, String apiName, Date startTime, Date endTime)
+    protected List<JobDetail> listJobs(int typeId, int logId, String apiName, Date startTime, Date endTime)
             throws AccessTokenException, CrmDataException, ErpApiException, ErpDataException {
         int currentPage = 1;
         int totalPage = 1;
@@ -72,6 +72,7 @@ public class FXKJobLogExecutor extends AbstractJobLogExecutor {
 
         return instances.stream().map(instance -> {
             JobDetail entity = new JobDetail();
+            entity.setTypeId(typeId);
             entity.setLogId(logId);
             entity.setDataId(instance.getDataId());
             return entity;

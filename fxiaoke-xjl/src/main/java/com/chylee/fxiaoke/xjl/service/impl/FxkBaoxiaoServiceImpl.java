@@ -15,8 +15,13 @@ public class FxkBaoxiaoServiceImpl extends AbstractCrmServiceImpl implements Fxk
     }
 
     @Override
-    public void save(Object_okom1__c pz) throws CrmApiException {
-        updateDataObj(pz, null , true, false);
+    public void update(String dataId, String db, String dh) throws CrmApiException {
+        Object_okom1__c toUpdate = new Object_okom1__c();
+        toUpdate.setDataObjectApiName("object_okom1__c");
+        toUpdate.set_id(dataId);
+        toUpdate.setField_EHyt1__c(db);
+        toUpdate.setField_8GijD__c(dh);
+        updateDataObj(toUpdate, null , true, false);
     }
 
     @Override

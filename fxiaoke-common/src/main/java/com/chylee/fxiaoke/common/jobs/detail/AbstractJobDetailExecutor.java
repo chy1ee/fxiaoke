@@ -109,6 +109,6 @@ public abstract class AbstractJobDetailExecutor extends ComplieModeSupported imp
 
     protected void Debug(String msg, Object... objects) {
         if (logger.isDebugEnabled())
-            logger.debug("{}" + msg, "######", objects);
+            logger.debug("######" + msg, objects);
     }
 }

@@ -52,12 +52,8 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
 
     @Override
     protected void writeErrorTo(String dataId, String error) {
-        Object_snPZx__c toUpdate = new Object_snPZx__c();
-        toUpdate.setDataObjectApiName("object_snPZx__c");
-        toUpdate.set_id(dataId);
-        toUpdate.setField_WCjgL__c(error);
         try {
-            hetongService2.save(toUpdate);
+            hetongService2.update(dataId, null, error);
         } catch (Exception e) {
             logger.error(error, e);
         }
@@ -69,25 +65,18 @@ public class HetongJobDetailExecutor extends AbstractAccountJobDetailExecutor {
         AccountRespEvent respEvent = (AccountRespEvent)resp;
 
         //回写客户编号CRM保存结果
-       //回写客户编号CRM保存结果
-       if(respEvent.isCreate()) {
+        if(respEvent.isCreate()) {
            updateAccountKhbh(reqEvent.getAccountObj().get_id(),
                    StringUtils.trim(respEvent.getCopma().getMA001(), false),
                    respEvent.getCopma().getMA003());
-       }
+        }
 
         //回写单号单别
         Object_snPZx__c ht = reqEvent.getHt();
         String db = ht.getField_d91gZ__c();
         String dh = ht.getField_WCjgL__c();
-
-        Object_snPZx__c toUpdate = new Object_snPZx__c();
-        toUpdate.setDataObjectApiName("object_snPZx__c");
-        toUpdate.set_id(ht.get_id());
-        toUpdate.setField_d91gZ__c(db);
-        toUpdate.setField_WCjgL__c(dh);
         try {
-            hetongService2.save(toUpdate);
+            hetongService2.update(ht.get_id(), db, dh);
         } catch (Exception e) {
             throw new CrmApiException(Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.code,
                     String.format("%s[合同][%s-%s][%s]", Constants.interfaceResponseCode.EXECUTOR_WRITE_BACK_ERROR.msg, db, dh, ht.get_id())

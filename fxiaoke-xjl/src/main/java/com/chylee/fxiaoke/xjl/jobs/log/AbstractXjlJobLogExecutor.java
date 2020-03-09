@@ -37,7 +37,7 @@ public abstract class AbstractXjlJobLogExecutor extends AbstractJobLogExecutor {
     }
 
     @Override
-    protected List<JobDetail> listJobs(Integer logId, String apiName, Date startTime, Date endTime)
+    protected List<JobDetail> listJobs(int typeId, int logId, String apiName, Date startTime, Date endTime)
             throws ErpDataException {
         ErpJobRespEvent respEvent = getErpJobResp(DateUtils.toLongString(startTime), DateUtils.toLongString(endTime));
         if (respEvent == null)
@@ -50,6 +50,7 @@ public abstract class AbstractXjlJobLogExecutor extends AbstractJobLogExecutor {
             List<String> result = respEvent.getDataIdList();
             return result.stream().map(dataId -> {
                 JobDetail entity = new JobDetail();
+                entity.setTypeId(typeId);
                 entity.setLogId(logId);
                 entity.setDataId(dataId);
                 return entity;

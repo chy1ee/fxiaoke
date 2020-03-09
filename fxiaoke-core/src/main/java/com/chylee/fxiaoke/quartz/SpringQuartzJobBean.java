@@ -70,7 +70,7 @@ public class SpringQuartzJobBean extends QuartzJobBean {
             StringWriter stringWriter = new StringWriter();
             e.printStackTrace(new PrintWriter(stringWriter));
             error = stringWriter.toString();
-            reportService.send("计划任务调度出错，请查看调度日志");
+            reportService.sendToAdmin("计划任务调度出错，请查看调度日志");
         }
         logService.updateEndtimeById(qrtzId, error);
     }

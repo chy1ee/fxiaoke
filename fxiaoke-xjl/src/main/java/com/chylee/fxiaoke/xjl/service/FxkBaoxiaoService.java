@@ -5,6 +5,6 @@ import com.chylee.fxiaoke.common.exception.CrmApiException;
 import com.chylee.fxiaoke.common.exception.CrmDataException;
 
 public interface FxkBaoxiaoService {
-    void save(Object_okom1__c pz) throws CrmApiException;
+    void update(String dataId, String db, String dh) throws CrmApiException;
     Object_okom1__c loadById(String id) throws CrmDataException, CrmApiException;
 }

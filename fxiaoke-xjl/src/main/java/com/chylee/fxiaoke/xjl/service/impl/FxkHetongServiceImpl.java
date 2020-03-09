@@ -32,8 +32,14 @@ public class FxkHetongServiceImpl extends AbstractCrmServiceImpl implements FxkH
     }
 
     @Override
-    public void save(Object_snPZx__c ht) throws CrmApiException {
-        updateDataObj(ht, null, true, false);
+    public void update(String ht, String db, String dh) throws CrmApiException {
+        Object_snPZx__c toUpdate = new Object_snPZx__c();
+        toUpdate.setDataObjectApiName("object_snPZx__c");
+        toUpdate.set_id(ht);
+        toUpdate.setField_d91gZ__c(db);
+        toUpdate.setField_WCjgL__c(dh);
+
+        updateDataObj(toUpdate, null, true, false);
     }
 
     @Override
